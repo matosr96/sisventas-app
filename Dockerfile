@@ -1,6 +1,6 @@
 # Etapa 1: compilar el panel. Etapa 2: servirlo con nginx. La URL de la API se escribe al
 # arrancar el contenedor (config.json desde API_URL): la misma imagen sirve para cualquier entorno.
-FROM node:24-alpine AS build
+FROM node:25-alpine AS build
 WORKDIR /app
 RUN corepack enable && corepack prepare pnpm@10 --activate
 COPY package.json pnpm-lock.yaml ./
