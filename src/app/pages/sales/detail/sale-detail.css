@@ -1,0 +1,12 @@
+.back { display: inline-flex; align-items: center; gap: 0.6rem; color: var(--text-muted); margin-bottom: 1.6rem; }
+.card { display: flex; flex-direction: column; gap: 2rem; padding: 2.4rem; background-color: var(--main-color); border-radius: var(--radius); box-shadow: var(--box-shadow); }
+.facts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.6rem; }
+.fact { display: flex; flex-direction: column; gap: 0.4rem; }
+.fact_label { font-size: 1.3rem; color: var(--text-muted); }
+.fact_value { font-size: 1.8rem; font-weight: 600; }
+.table th, .table td { padding: 1rem 1.2rem; text-align: left; border-bottom: 1px solid var(--border-color); }
+.table th { font-size: 1.3rem; color: var(--text-muted); }
+.num { text-align: right; }
+.toolbar { display: flex; justify-content: flex-end; gap: 1.2rem; }
+.error { padding: 2rem; border-radius: var(--radius); background-color: var(--red-soft); color: var(--red-dark); }
+@media (max-width: 768px) { .facts { grid-template-columns: 1fr; } .card { overflow-x: auto; } }

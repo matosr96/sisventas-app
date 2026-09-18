@@ -1,0 +1,100 @@
+/* Reset + las dos paletas. Es el UNICO CSS global: todo lo demas vive en el .css de cada componente
+   y solo usa var(--...). Un color nuevo se define en las dos paletas o rompe el otro tema. */
+
+:root {
+  --font: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --radius: 1.2rem;
+  --sidebar-width: 24rem;
+
+  /* Superficies */
+  --bg-color: #f4f6fb;        /* pagina */
+  --main-color: #ffffff;      /* tarjeta */
+  --white-one: #f1f4fa;       /* hover */
+  --white-two: #e8ecf5;       /* fondo hundido */
+  --field-bg: #ffffff;        /* campos */
+  --border-color: #dfe4ee;
+  --overlay: rgba(15, 23, 42, 0.45);
+
+  /* Texto */
+  --text-color: #0f172a;
+  --text-muted: #64748b;
+  --on-accent: #ffffff;       /* texto SOBRE un fondo de acento */
+  --on-accent-soft: #e0e7ff;
+
+  /* Acentos: azul = accion primaria; verde = correcto; ambar = aviso; rojo = error/destructivo */
+  --blue-bg: #2563eb;
+  --blue-dark: #1d4ed8;
+  --blue-soft: #dbeafe;
+  --green-bg: #16a34a;
+  --green-dark: #15803d;
+  --green-soft: #dcfce7;
+  --amber-bg: #d97706;
+  --amber-dark: #b45309;
+  --amber-soft: #fef3c7;
+  --red-bg: #dc2626;
+  --red-dark: #b91c1c;
+  --red-soft: #fee2e2;
+
+  --box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06), 0 1px 3px rgba(15, 23, 42, 0.08);
+  --box-shadow-md: 0 10px 30px rgba(15, 23, 42, 0.18);
+  --scrollbar-thumb: #cbd5e1;
+  --scrollbar-thumb-hover: #94a3b8;
+}
+
+:root[data-theme="dark"] {
+  --bg-color: #0b1220;
+  --main-color: #111a2e;
+  --white-one: #172238;
+  --white-two: #0e1628;
+  --field-bg: #0e1628;
+  --border-color: #26324a;
+  --overlay: rgba(2, 6, 23, 0.7);
+
+  --text-color: #e5e9f2;
+  --text-muted: #94a3b8;
+  --on-accent: #ffffff;
+  --on-accent-soft: #c7d2fe;
+
+  --blue-bg: #4f7cff;
+  --blue-dark: #86a4ff;
+  --blue-soft: #1e2a4d;
+  --green-bg: #22c55e;
+  --green-dark: #86efac;
+  --green-soft: #143324;
+  --amber-bg: #f59e0b;
+  --amber-dark: #fcd34d;
+  --amber-soft: #3a2a0c;
+  --red-bg: #ef4444;
+  --red-dark: #fca5a5;
+  --red-soft: #3f1519;
+
+  --box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --box-shadow-md: 0 10px 30px rgba(0, 0, 0, 0.6);
+  --scrollbar-thumb: #334155;
+  --scrollbar-thumb-hover: #475569;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* 62.5% => 1rem = 10px. Todas las medidas en rem; px solo para bordes de 1-2px. */
+html { font-size: 62.5%; }
+
+body {
+  font-family: var(--font);
+  font-size: 1.4rem;
+  line-height: 1.5;
+  color: var(--text-color);
+  background-color: var(--bg-color);
+  -webkit-font-smoothing: antialiased;
+  transition: background-color .2s ease, color .2s ease;
+}
+
+a { color: inherit; text-decoration: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; background: none; border: none; }
+ul { list-style: none; }
+table { border-collapse: collapse; width: 100%; }
+
+::-webkit-scrollbar { width: 0.8rem; height: 0.8rem; }
+::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 1rem; }
+::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-thumb-hover); }

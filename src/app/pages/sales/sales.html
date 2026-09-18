@@ -1,0 +1,10 @@
+<app-layout>
+  <app-header-page title="Ventas" icon="bx-receipt" [items]="['Inicio', 'Ventas']" nameButton="Registrar venta" [(searchTerm)]="list.searchTerm" (create)="create()" />
+  @if (list.isLoading()) { <app-loader /> }
+  @else if (list.isError()) { <p class="error">No se pudieron cargar las ventas. Reintenta en unos segundos.</p> }
+  @else if (rows().length > 0) {
+    <app-table [data]="rows()" [headers]="['Número', 'Fecha', 'Líneas', 'Total']" [keys]="['saleNumber', 'dateLabel', 'lines', 'totalLabel']" [screenName]="screen" (rowClick)="open($event)" (remove)="remove($event)" />
+  } @else {
+    <app-empty title="Ventas" copy="Registra la primera venta: elige productos y cantidades; el precio y el total los pone el sistema." buttonName="Registrar venta" (create)="create()" />
+  }
+</app-layout>

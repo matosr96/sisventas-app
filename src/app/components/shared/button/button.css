@@ -1,0 +1,13 @@
+.button {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.8rem; padding: 1rem 1.6rem;
+  border-radius: var(--radius); font-weight: 600; background-color: var(--blue-bg); color: var(--on-accent);
+  transition: background-color .2s ease, opacity .2s ease; white-space: nowrap;
+}
+.button:hover { background-color: var(--blue-dark); }
+.button:disabled { opacity: 0.6; cursor: not-allowed; }
+.ghost { background-color: var(--white-two); color: var(--text-color); }
+.ghost:hover { background-color: var(--white-one); }
+.danger { background-color: var(--red-bg); }
+.danger:hover { background-color: var(--red-dark); }
+.button i { font-size: 1.8rem; }
+@media (max-width: 768px) { .button { width: 100%; } }

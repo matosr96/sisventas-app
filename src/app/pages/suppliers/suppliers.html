@@ -1,0 +1,13 @@
+<app-layout>
+  <app-header-page title="Proveedores" icon="bx-store" [items]="['Inicio', 'Proveedores']"
+    nameButton="Crear proveedor" [(searchTerm)]="list.searchTerm" (create)="creating.set(true)" />
+  @if (list.isLoading()) { <app-loader /> }
+  @else if (list.isError()) { <p class="error">No se pudieron cargar los proveedores. Reintenta en unos segundos.</p> }
+  @else if (rows().length > 0) {
+    <app-table [data]="rows()" [headers]="['Nombre', 'NIT', 'Teléfono', 'Correo', 'Estado']" [keys]="['name', 'taxId', 'phone', 'email', 'statusLabel']" [screenName]="screen" (edit)="edit($event)" (remove)="remove($event)" />
+  } @else {
+    <app-empty title="Proveedores" copy="Registra a quién le compras: nombre, NIT y contacto." buttonName="Crear proveedor" (create)="creating.set(true)" />
+  }
+</app-layout>
+<app-create-supplier [open]="creating()" (closed)="creating.set(false)" />
+@if (editing(); as supplier) { <app-update-supplier [supplier]="supplier" (closed)="editing.set(null)" /> }

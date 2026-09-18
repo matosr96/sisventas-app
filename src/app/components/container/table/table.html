@@ -1,0 +1,27 @@
+<div class="wrapper">
+  <table class="table">
+    <thead>
+      <tr>
+        @for (header of headers(); track header) { <th>{{ header }}</th> }
+        <th class="actions_col">Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (row of rows(); track row['id']) {
+        <tr class="row" (click)="rowClick.emit(row)">
+          @for (key of keys(); track key) { <td>{{ render(row[key]) }}</td> }
+          <td class="actions_col">
+            <app-actions [screenName]="screenName()" (edit)="edit.emit(row)" (remove)="remove.emit(row)" />
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+  @if (pages() > 1) {
+    <footer class="pagination">
+      <button type="button" class="page_button" (click)="previous()" [disabled]="currentPage() === 1"><i class="bx bx-chevron-left"></i></button>
+      <span class="page_label">Página {{ currentPage() }} de {{ pages() }}</span>
+      <button type="button" class="page_button" (click)="next()" [disabled]="currentPage() === pages()"><i class="bx bx-chevron-right"></i></button>
+    </footer>
+  }
+</div>

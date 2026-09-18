@@ -1,0 +1,11 @@
+.back { display: inline-flex; align-items: center; gap: 0.6rem; color: var(--text-muted); margin-bottom: 1.6rem; }
+.card { display: flex; flex-direction: column; gap: 1.6rem; padding: 2.4rem; background-color: var(--main-color); border-radius: var(--radius); box-shadow: var(--box-shadow); max-width: 96rem; }
+.section { font-size: 1.6rem; font-weight: 600; margin-top: 0.8rem; }
+.line { display: grid; grid-template-columns: 3fr 1fr 1fr auto; gap: 1.2rem; align-items: end; }
+.remove { display: flex; padding: 1rem; border-radius: var(--radius); color: var(--text-muted); }
+.remove:hover:not(:disabled) { background-color: var(--red-soft); color: var(--red-dark); }
+.remove:disabled { opacity: 0.3; }
+.remove i { font-size: 2rem; }
+.toolbar { display: flex; align-items: center; justify-content: space-between; gap: 1.6rem; }
+.total { font-size: 1.6rem; }
+@media (max-width: 768px) { .line { grid-template-columns: 1fr; } .toolbar { flex-direction: column; align-items: stretch; } }

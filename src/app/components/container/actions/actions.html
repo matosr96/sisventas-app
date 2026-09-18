@@ -1,0 +1,8 @@
+<div class="actions">
+  @if (canEdit()) {
+    <button type="button" class="action" (click)="$event.stopPropagation(); edit.emit()" title="Editar" aria-label="Editar"><i class="bx bx-edit-alt"></i></button>
+  }
+  @if (canDelete()) {
+    <button type="button" class="action danger" (click)="$event.stopPropagation(); remove.emit()" [title]="removeLabel()" [attr.aria-label]="removeLabel()"><i class="bx bx-trash"></i></button>
+  }
+</div>

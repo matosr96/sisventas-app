@@ -1,0 +1,46 @@
+<app-layout>
+  <app-header-page title="Inicio" icon="bx-home-alt" [items]="['Inicio']" [searchable]="false" />
+  @if (summary.isLoading()) {
+    <app-loader />
+  } @else {
+    <section class="metrics">
+      <app-metric-card label="Ventas registradas" [value]="summary.saleCount()" icon="bx-receipt" />
+      <app-metric-card label="Total vendido" [value]="formatMoney(summary.salesTotal())" icon="bx-dollar-circle" tone="ok" />
+      <app-metric-card label="Productos" [value]="summary.productCount()" icon="bx-package" />
+      <app-metric-card label="Compras" [value]="summary.purchaseCount()" icon="bx-cart-download" />
+    </section>
+    <section class="panels">
+      <article class="panel">
+        <h2 class="panel_title"><i class="bx bx-error"></i>Stock bajo</h2>
+        @if (summary.lowStock().length === 0) {
+          <p class="muted">Ningún producto está por debajo de su mínimo.</p>
+        } @else {
+          <ul class="list">
+            @for (product of summary.lowStock(); track product.id) {
+              <li class="item">
+                <a class="item_link" [routerLink]="[routes.PRODUCTS, product.id]">{{ product.name }}</a>
+                <span class="chip warn">{{ product.currentStock }} / mín. {{ product.lowStock }}</span>
+              </li>
+            }
+          </ul>
+        }
+      </article>
+      <article class="panel">
+        <h2 class="panel_title"><i class="bx bx-time-five"></i>Últimas ventas</h2>
+        @if (summary.recentSales().length === 0) {
+          <p class="muted">Todavía no hay ventas. <a class="inline_link" [routerLink]="routes.SALES">Registra la primera.</a></p>
+        } @else {
+          <ul class="list">
+            @for (sale of summary.recentSales(); track sale.id) {
+              <li class="item">
+                <a class="item_link" [routerLink]="[routes.SALES, sale.id]">{{ sale.saleNumber }}</a>
+                <span class="muted">{{ formatDateTime(sale.saleDate) }}</span>
+                <span class="amount">{{ formatMoney(sale.total) }}</span>
+              </li>
+            }
+          </ul>
+        }
+      </article>
+    </section>
+  }
+</app-layout>

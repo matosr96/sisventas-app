@@ -1,0 +1,11 @@
+<button
+  class="button"
+  [class.ghost]="variant() === 'ghost'"
+  [class.danger]="variant() === 'danger'"
+  [type]="type()"
+  [disabled]="disabled()"
+  (click)="clicked.emit()"
+>
+  @if (icon()) { <i class="bx" [class]="'bx ' + icon()"></i> }
+  {{ name() }}
+</button>

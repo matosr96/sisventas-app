@@ -1,0 +1,10 @@
+<header class="header">
+  <div class="titles">
+    <app-breadcrumbs [items]="items()" />
+    <h1 class="title"><i class="bx" [class]="'bx ' + icon()"></i>{{ title() }}</h1>
+  </div>
+  <div class="toolbar">
+    @if (searchable()) { <app-search [(value)]="searchTerm" /> }
+    @if (nameButton()) { <app-button [name]="nameButton()" type="button" icon="bx-plus" (clicked)="create.emit()" /> }
+  </div>
+</header>

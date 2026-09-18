@@ -1,0 +1,12 @@
+<span class="logo" [class.sm]="size() === 'sm'" [class.lg]="size() === 'lg'">
+  <svg class="mark" viewBox="0 0 32 32" aria-hidden="true">
+    <circle cx="16" cy="16" r="13" fill="none" stroke="var(--blue-bg)" stroke-width="4"></circle>
+    <path d="M10 16h12M16 10v12" stroke="currentColor" stroke-width="3" stroke-linecap="round"></path>
+  </svg>
+  @if (variant() !== 'mark') {
+    <span class="text">
+      <span class="name">SisVentas</span>
+      @if (variant() === 'lockup') { <span class="sub">Punto de venta</span> }
+    </span>
+  }
+</span>

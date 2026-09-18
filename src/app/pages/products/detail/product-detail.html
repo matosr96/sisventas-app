@@ -1,0 +1,55 @@
+<app-layout>
+  @if (detail.isLoading()) {
+    <app-loader />
+  } @else if (detail.product(); as product) {
+    <app-header-page [title]="product.name" icon="bx-package" [items]="['Inicio', 'Productos', product.sku]" [searchable]="false"
+      [nameButton]="auth.isAdmin() ? 'Ajustar stock' : ''" (create)="adjusting.set(true)" />
+    <a class="back" [routerLink]="routes.PRODUCTS"><i class="bx bx-arrow-back"></i>Volver a productos</a>
+    <section class="facts">
+      <div class="fact"><span class="fact_label">SKU</span><span class="fact_value">{{ product.sku }}</span></div>
+      <div class="fact"><span class="fact_label">Precio de venta</span><span class="fact_value">{{ formatMoney(product.salePrice) }}</span></div>
+      <div class="fact"><span class="fact_label">Último costo</span><span class="fact_value">{{ formatMoney(product.purchasePrice) || '—' }}</span></div>
+      <div class="fact"><span class="fact_label">Stock actual</span><span class="fact_value" [class.low]="product.lowStock !== null && product.currentStock <= product.lowStock">{{ product.currentStock }}</span></div>
+      <div class="fact"><span class="fact_label">Estado</span><span class="fact_value">{{ productStatusLabel(product.status) }}</span></div>
+    </section>
+    <section class="ledger">
+      <h2 class="ledger_title"><i class="bx bx-book"></i>Libro de stock</h2>
+      @if (movements.isLoading()) {
+        <app-loader />
+      } @else if (movements.items().length === 0) {
+        <p class="muted">Sin movimientos todavía.</p>
+      } @else {
+        <table class="table">
+          <thead><tr><th>Fecha</th><th>Movimiento</th><th>Cantidad</th><th>Saldo</th><th>Referencia</th></tr></thead>
+          <tbody>
+            @for (movement of movements.items(); track movement.id) {
+              <tr>
+                <td>{{ formatDateTime(movement.createdAt) }}</td>
+                <td>{{ movementTypeLabel(movement.type) }}</td>
+                <td [class.in]="movement.quantity > 0" [class.out]="movement.quantity < 0">{{ movement.quantity > 0 ? '+' : '' }}{{ movement.quantity }}</td>
+                <td>{{ movement.stockAfter }}</td>
+                <td class="muted">{{ movement.reference || movement.reason || '' }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+        @if (movements.pages() > 1) {
+          <footer class="pagination">
+            <button type="button" class="page_button" (click)="movements.previous()" [disabled]="movements.page() === 1"><i class="bx bx-chevron-left"></i></button>
+            <span class="muted">Página {{ movements.page() }} de {{ movements.pages() }}</span>
+            <button type="button" class="page_button" (click)="movements.next()" [disabled]="movements.page() === movements.pages()"><i class="bx bx-chevron-right"></i></button>
+          </footer>
+        }
+      }
+    </section>
+  } @else {
+    <p class="error">No se pudo cargar el producto.</p>
+  }
+</app-layout>
+<app-modal [open]="adjusting()" title="Ajustar stock" (closed)="adjusting.set(false)">
+  <form class="form" (submit)="adjust($event)">
+    <app-number-input name="quantity" label="Cantidad (positiva suma, negativa resta)" [(value)]="adjustment.form.quantity" [required]="true" step="1" />
+    <app-input name="reason" label="Motivo" [(value)]="adjustment.form.reason" [required]="true" placeholder="Merma, conteo, rotura…" />
+    <app-button [name]="adjustment.pending() ? 'Guardando…' : 'Registrar ajuste'" [disabled]="adjustment.pending()" />
+  </form>
+</app-modal>

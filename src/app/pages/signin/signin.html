@@ -1,0 +1,11 @@
+<main class="page">
+  <section class="card">
+    <app-logo variant="lockup" size="lg" />
+    <p class="copy">Ingresa con tu usuario para gestionar el punto de venta.</p>
+    <form class="form" (submit)="op.submit($event)">
+      <app-input name="username" label="Usuario" [(value)]="op.form.username" [required]="true" />
+      <app-input name="password" label="Contraseña" type="password" [(value)]="op.form.password" [required]="true" />
+      <app-button [name]="op.pending() ? 'Ingresando…' : 'Ingresar'" [disabled]="op.pending()" />
+    </form>
+  </section>
+</main>

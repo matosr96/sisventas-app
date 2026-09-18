@@ -1,0 +1,25 @@
+<app-layout>
+  <app-header-page title="Registrar compra" icon="bx-cart-download" [items]="['Inicio', 'Compras', 'Nueva']" [searchable]="false" />
+  <a class="back" [routerLink]="routes.PURCHASES"><i class="bx bx-arrow-back"></i>Volver a compras</a>
+  @if (op.isLoading()) {
+    <app-loader />
+  } @else {
+    <form class="card" (submit)="op.submit($event)">
+      <app-select name="supplierId" label="Proveedor" [options]="supplierOptions()" [(value)]="op.supplierId" [required]="true" />
+      <h2 class="section">Líneas</h2>
+      @for (line of op.lines(); track $index; let i = $index) {
+        <div class="line">
+          <app-select name="product" label="Producto" [options]="productOptions()" [value]="line.productId" (valueChange)="op.setLine(i, { productId: $event })" [required]="true" />
+          <app-number-input name="quantity" label="Cantidad" [value]="line.quantity" (valueChange)="op.setLine(i, { quantity: $event })" [min]="1" step="1" [required]="true" />
+          <app-number-input name="unitCost" label="Costo unitario" [value]="line.unitCost" (valueChange)="op.setLine(i, { unitCost: $event })" [min]="0" [required]="true" />
+          <button type="button" class="remove" (click)="op.removeLine(i)" [disabled]="op.lines().length === 1" aria-label="Quitar línea"><i class="bx bx-x"></i></button>
+        </div>
+      }
+      <div class="toolbar">
+        <app-button name="Añadir línea" type="button" variant="ghost" icon="bx-plus" (clicked)="op.addLine()" />
+        <span class="total">Total: <strong>{{ formatMoney(op.total()) }}</strong></span>
+      </div>
+      <app-button [name]="op.pending() ? 'Registrando…' : 'Registrar compra'" [disabled]="op.pending()" />
+    </form>
+  }
+</app-layout>

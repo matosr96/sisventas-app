@@ -1,0 +1,8 @@
+.overlay { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background-color: var(--overlay); padding: 2rem; z-index: 40; }
+.modal { width: 100%; max-width: 56rem; max-height: 90vh; display: flex; flex-direction: column; background-color: var(--main-color); border-radius: var(--radius); box-shadow: var(--box-shadow-md); }
+.modal_lg { max-width: 96rem; }
+.header { display: flex; align-items: center; justify-content: space-between; padding: 2rem 2.4rem; border-bottom: 1px solid var(--border-color); }
+.title { font-size: 1.8rem; font-weight: 600; }
+.close { color: var(--text-muted); font-size: 2.4rem; display: flex; }
+.body { padding: 2.4rem; overflow: auto; }
+@media (max-width: 768px) { .modal { max-height: 100vh; } }

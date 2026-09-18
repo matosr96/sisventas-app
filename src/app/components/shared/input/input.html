@@ -1,0 +1,12 @@
+<label class="field">
+  @if (label()) { <span class="label">{{ label() }}</span> }
+  <input
+    class="input"
+    [name]="name()"
+    [type]="type()"
+    [placeholder]="placeholder()"
+    [required]="required()"
+    [value]="value()"
+    (input)="onInput($event)"
+  />
+</label>

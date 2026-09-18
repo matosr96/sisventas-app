@@ -1,0 +1,20 @@
+<app-layout>
+  <app-header-page title="Productos" icon="bx-package" [items]="['Inicio', 'Productos']"
+    [nameButton]="auth.isAdmin() ? 'Crear producto' : ''" [(searchTerm)]="list.searchTerm" (create)="creating.set(true)" />
+  @if (list.isLoading()) {
+    <app-loader />
+  } @else if (list.isError()) {
+    <p class="error">No se pudo cargar el catálogo. Reintenta en unos segundos.</p>
+  } @else if (rows().length > 0) {
+    <app-table [data]="rows()" [headers]="['SKU', 'Nombre', 'Precio', 'Stock', 'Estado']"
+      [keys]="['sku', 'name', 'priceLabel', 'stockLabel', 'statusLabel']" [screenName]="screen"
+      (rowClick)="open($event)" (edit)="edit($event)" (remove)="remove($event)" />
+  } @else {
+    <app-empty title="Productos" copy="Crea el primer producto del catálogo con su SKU, precio y stock inicial."
+      [buttonName]="auth.isAdmin() ? 'Crear producto' : ''" (create)="creating.set(true)" />
+  }
+</app-layout>
+<app-create-product [open]="creating()" (closed)="creating.set(false)" />
+@if (editing(); as product) {
+  <app-update-product [product]="product" (closed)="editing.set(null)" />
+}

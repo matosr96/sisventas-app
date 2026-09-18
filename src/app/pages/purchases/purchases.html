@@ -1,0 +1,10 @@
+<app-layout>
+  <app-header-page title="Compras" icon="bx-cart-download" [items]="['Inicio', 'Compras']" nameButton="Registrar compra" [(searchTerm)]="list.searchTerm" (create)="create()" />
+  @if (list.isLoading()) { <app-loader /> }
+  @else if (list.isError()) { <p class="error">No se pudieron cargar las compras. Reintenta en unos segundos.</p> }
+  @else if (rows().length > 0) {
+    <app-table [data]="rows()" [headers]="['Número', 'Proveedor', 'Fecha', 'Líneas', 'Total']" [keys]="['purchaseNumber', 'supplierName', 'dateLabel', 'lines', 'totalLabel']" [screenName]="screen" (rowClick)="open($event)" (remove)="remove($event)" />
+  } @else {
+    <app-empty title="Compras" copy="Registra la primera compra a proveedor: suma stock y congela el costo." buttonName="Registrar compra" (create)="create()" />
+  }
+</app-layout>

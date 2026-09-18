@@ -1,0 +1,13 @@
+<app-layout>
+  <app-header-page title="Categorías" icon="bx-category" [items]="['Inicio', 'Categorías']"
+    [nameButton]="auth.isAdmin() ? 'Crear categoría' : ''" [(searchTerm)]="list.searchTerm" (create)="creating.set(true)" />
+  @if (list.isLoading()) { <app-loader /> }
+  @else if (list.isError()) { <p class="error">No se pudieron cargar las categorías. Reintenta en unos segundos.</p> }
+  @else if (rows().length > 0) {
+    <app-table [data]="rows()" [headers]="['Nombre', 'Icono']" [keys]="['name', 'icon']" [screenName]="screen" (edit)="edit($event)" (remove)="remove($event)" />
+  } @else {
+    <app-empty title="Categorías" copy="Agrupa el catálogo: crea la primera categoría." [buttonName]="auth.isAdmin() ? 'Crear categoría' : ''" (create)="creating.set(true)" />
+  }
+</app-layout>
+<app-create-category [open]="creating()" (closed)="creating.set(false)" />
+@if (editing(); as category) { <app-update-category [category]="category" (closed)="editing.set(null)" /> }

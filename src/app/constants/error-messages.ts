@@ -1,0 +1,30 @@
+// La API responde { message: "<código>" }; aquí vive la única traducción a español.
+export const ErrorMessages: Record<string, string> = {
+  "601": "El producto no existe.",
+  "602": "La categoría no existe.",
+  "603": "La venta no existe.",
+  "604": "El usuario no existe.",
+  "605": "El proveedor no existe.",
+  "606": "La compra no existe.",
+  "607": "El producto está retirado y no se puede vender ni comprar.",
+  "610": "Ese nombre de usuario ya está en uso.",
+  "611": "Credenciales inválidas.",
+  "612": "Falta el rol por defecto en el sistema.",
+  "613": "No tienes permiso para esta acción.",
+  "614": "No puedes cambiar tu propio rol ni desactivarte.",
+  "615": "La contraseña actual no es correcta.",
+  "616": "El rol no existe.",
+  "620": "La categoría tiene productos y no se puede eliminar.",
+  "621": "No hay stock suficiente.",
+  "622": "Ese SKU ya existe.",
+  "623": "Ya existe una categoría con ese nombre.",
+  "624": "Ya existe un proveedor con ese nombre.",
+  "625": "El proveedor está inactivo.",
+  "630": "Parámetros de paginación inválidos.",
+  "631": "Revisa los datos del formulario.",
+  "640": "Demasiados intentos. Espera un minuto.",
+  "690": "El registro está en uso y no se puede modificar.",
+  "699": "Error inesperado del servidor.",
+};
+
+export const DEFAULT_ERROR_MESSAGE = "No se pudo completar la operación.";

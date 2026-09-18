@@ -1,0 +1,14 @@
+<div class="toaster" aria-live="polite">
+  @for (message of toast.messages(); track message.id) {
+    <div class="toast" [class.success]="message.tone === 'success'" [class.error]="message.tone === 'error'" [class.warning]="message.tone === 'warning'">
+      <i class="bx" [class.bx-check-circle]="message.tone === 'success'" [class.bx-error-circle]="message.tone === 'error'" [class.bx-error]="message.tone === 'warning'"></i>
+      <span class="text">{{ message.text }}</span>
+      @if (message.action) {
+        <button type="button" class="action" (click)="run(message, message.action)">{{ message.action.label }}</button>
+        <button type="button" class="cancel" (click)="run(message, message.cancel)">{{ message.cancel?.label }}</button>
+      } @else {
+        <button type="button" class="close" (click)="toast.dismiss(message.id)" aria-label="Cerrar"><i class="bx bx-x"></i></button>
+      }
+    </div>
+  }
+</div>

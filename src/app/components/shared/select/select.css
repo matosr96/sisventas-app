@@ -1,0 +1,7 @@
+.field { display: flex; flex-direction: column; gap: 0.6rem; width: 100%; }
+.label { font-size: 1.3rem; font-weight: 500; color: var(--text-muted); }
+.select {
+  width: 100%; padding: 1rem 1.2rem; border-radius: var(--radius); border: 1px solid var(--border-color);
+  background-color: var(--field-bg); color: var(--text-color); transition: border-color .2s ease, box-shadow .2s ease;
+}
+.select:focus { outline: none; border-color: var(--blue-bg); box-shadow: 0 0 0 3px var(--blue-soft); }

@@ -1,0 +1,28 @@
+<app-layout>
+  <app-header-page title="Registrar venta" icon="bx-receipt" [items]="['Inicio', 'Ventas', 'Nueva']" [searchable]="false" />
+  <a class="back" [routerLink]="routes.SALES"><i class="bx bx-arrow-back"></i>Volver a ventas</a>
+  @if (op.isLoading()) {
+    <app-loader />
+  } @else {
+    <form class="card" (submit)="op.submit($event)">
+      <h2 class="section">Líneas</h2>
+      @for (line of op.lines(); track $index; let i = $index) {
+        <div class="line">
+          <app-select name="product" label="Producto" [options]="productOptions()" [value]="line.productId" (valueChange)="op.setLine(i, { productId: $event })" [required]="true" />
+          <app-number-input name="quantity" label="Cantidad" [value]="line.quantity" (valueChange)="op.setLine(i, { quantity: $event })" [min]="1" step="1" [required]="true" />
+          <div class="price">
+            <span class="price_label">Precio</span>
+            <span class="price_value">{{ formatMoney(op.productById(line.productId)?.salePrice ?? 0) }}</span>
+          </div>
+          <button type="button" class="remove" (click)="op.removeLine(i)" [disabled]="op.lines().length === 1" aria-label="Quitar línea"><i class="bx bx-x"></i></button>
+        </div>
+      }
+      <div class="toolbar">
+        <app-button name="Añadir línea" type="button" variant="ghost" icon="bx-plus" (clicked)="op.addLine()" />
+        <span class="total">Total estimado: <strong>{{ formatMoney(op.estimatedTotal()) }}</strong></span>
+      </div>
+      <p class="hint">El precio se congela al registrar y el total lo calcula el servidor: esto es una estimación con el precio actual.</p>
+      <app-button [name]="op.pending() ? 'Registrando…' : 'Registrar venta'" [disabled]="op.pending()" />
+    </form>
+  }
+</app-layout>
