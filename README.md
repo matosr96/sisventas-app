@@ -10,6 +10,28 @@ its loading, error, empty and data states.
 
 > Code is in English; the interface, comments and internal docs are in Spanish.
 
+## Screenshots
+
+| Home | Point of sale |
+| --- | --- |
+| ![Home](docs/screenshots/home.png) | ![Point of sale](docs/screenshots/pos.png) |
+
+| Checkout | Sale detail with a partial return |
+| --- | --- |
+| ![Checkout](docs/screenshots/checkout.png) | ![Sale detail](docs/screenshots/sale-detail.png) |
+
+| Products | Sales |
+| --- | --- |
+| ![Products](docs/screenshots/products.png) | ![Sales](docs/screenshots/sales.png) |
+
+| Reports | Cash closing |
+| --- | --- |
+| ![Reports](docs/screenshots/reports.png) | ![Cash closing](docs/screenshots/closing.png) |
+
+| Inventory ledger | Dark theme |
+| --- | --- |
+| ![Inventory](docs/screenshots/inventory.png) | ![Dark theme](docs/screenshots/dark-home.png) |
+
 ## What it does
 
 - **Sign in** with the API's JWT; roles `USER` (seller) and `ADMIN` drive the menu, the routes and a
