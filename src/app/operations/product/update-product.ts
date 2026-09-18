@@ -16,6 +16,7 @@ export function updateProduct(current: Product, pick: (item: Product) => UpdateP
 
   const submit = async (event: Event): Promise<boolean> => {
     event.preventDefault();
+    if (pending()) return false; // Enter repetido mientras se guarda: una sola petición
     pending.set(true);
     try {
       await api.update(current.id, { ...form });

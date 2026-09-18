@@ -1,15 +1,11 @@
-import { computed, inject } from "@angular/core";
+import { inject } from "@angular/core";
 import { Resources } from "../../constants";
-import { EmptyPurchasesState } from "../../entities";
+import type { ListQuery } from "../../entities";
 import { PurchasesApi } from "../../services";
-import { filterableList, listResource, safeValue } from "../list-resource";
+import { serverList } from "../list-resource";
 
-/** Listado con búsqueda y chips derivados en el render: se guarda el término y los filtros, no la lista. */
-export function listPurchases() {
+/** Listado en servidor: página, orden, búsqueda y chips viajan como params; la API decide. */
+export function listPurchases(initial: Partial<ListQuery> = {}) {
   const api = inject(PurchasesApi);
-  const ref = listResource(Resources.PURCHASES, () => api.list(), EmptyPurchasesState);
-  const data = safeValue(ref, EmptyPurchasesState);
-  const items = computed(() => data().items);
-  const search = filterableList(items, (purchase, term) => [purchase.purchaseNumber, purchase.supplierName].join(" ").toLowerCase().includes(term));
-  return { ref, items, ...search, isLoading: ref.isLoading, isError: computed(() => ref.error() != null) };
+  return serverList(Resources.PURCHASES, (query) => api.list(query), { sort: "date", dir: "desc", ...initial });
 }

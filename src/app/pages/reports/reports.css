@@ -1,0 +1,22 @@
+.link { display: inline-flex; align-items: center; gap: 0.6rem; font-weight: 600; color: var(--blue-bg); }
+.period { margin-bottom: 1.6rem; color: var(--text-muted); }
+.metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.6rem; margin-bottom: 1.6rem; }
+.panels { display: grid; grid-template-columns: 1fr 1fr; gap: 1.6rem; }
+.panel { padding: 2rem; margin-bottom: 1.6rem; background-color: var(--main-color); border-radius: var(--radius); box-shadow: var(--box-shadow); }
+.panel_title { display: flex; align-items: center; gap: 0.8rem; font-size: 1.6rem; font-weight: 600; margin-bottom: 1.2rem; }
+.panel_title i { color: var(--blue-bg); }
+.muted { color: var(--text-muted); font-weight: 400; }
+.block { display: block; font-size: 1.2rem; }
+.bars { display: flex; flex-direction: column; gap: 1rem; }
+.bar_row { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 2fr) auto; align-items: center; gap: 1.2rem; }
+.bar_label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500; }
+.bar_track { height: 1rem; border-radius: 99rem; background-color: var(--white-two); overflow: hidden; }
+.bar_fill { display: block; height: 100%; background-color: var(--blue-bg); border-radius: 99rem; }
+.bar_value { font-weight: 600; }
+.table th, .table td { padding: 0.8rem 1rem; text-align: left; border-bottom: 1px solid var(--border-color); vertical-align: top; }
+.table th { font-size: 1.2rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; }
+.num { text-align: right; }
+.negative { color: var(--red-dark); }
+.row_link:hover { color: var(--blue-bg); }
+.error { padding: 2rem; border-radius: var(--radius); background-color: var(--red-soft); color: var(--red-dark); }
+@media (max-width: 768px) { .metrics, .panels { grid-template-columns: 1fr; } .bar_row { grid-template-columns: 1fr; gap: 0.4rem; } }

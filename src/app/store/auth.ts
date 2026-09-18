@@ -13,14 +13,25 @@ const read = (): PersistedAuth => {
   }
 };
 
-/** Sesión del usuario. Único estado global de cliente junto con UiStore; siempre se consume por señal. */
+/** Caducidad (`exp`, en segundos) leída del JWT sin verificarlo: solo sirve para avisar y cerrar a tiempo. */
+export const tokenExpiresAt = (token: string): number | null => {
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/"))) as { exp?: number };
+    return payload.exp ? payload.exp * 1000 : null;
+  } catch {
+    return null;
+  }
+};
+
+/** Sesión del usuario. Único estado global de cliente junto con UiStore y SettingsStore; siempre se consume por señal. */
 @Injectable({ providedIn: "root" })
 export class AuthStore {
   private readonly initial = read();
   readonly token = signal<string>(this.initial.token);
   readonly user = signal<User | null>(this.initial.user);
 
-  readonly isAuthenticated = computed(() => this.token() !== "");
+  readonly expiresAt = computed(() => (this.token() ? tokenExpiresAt(this.token()) : null));
+  readonly isAuthenticated = computed(() => this.token() !== "" && (this.expiresAt() === null || this.expiresAt()! > Date.now()));
   readonly roles = computed(() => this.user()?.roles ?? []);
   readonly isAdmin = computed(() => this.roles().includes(RoleName.ADMIN));
   readonly fullName = computed(() => {

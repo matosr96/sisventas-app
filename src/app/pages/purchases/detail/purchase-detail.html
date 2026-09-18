@@ -10,7 +10,7 @@
     <section class="card">
       <div class="facts">
         <div class="fact"><span class="fact_label">Proveedor</span><span class="fact_value">{{ purchase.supplierName }}</span></div>
-        <div class="fact"><span class="fact_label">Fecha</span><span class="fact_value">{{ formatDateTime(purchase.purchaseDate) }}</span></div>
+        <div class="fact"><span class="fact_label">Fecha</span><span class="fact_value">{{ formatDateTime(purchase.purchaseDate) }} <button type="button" class="fact_edit" (click)="openDateEditor()" title="Corregir fecha" aria-label="Corregir fecha"><i class="bx bx-edit-alt"></i></button></span></div>
         <div class="fact"><span class="fact_label">Unidades</span><span class="fact_value">{{ units() }}</span></div>
       </div>
       <table class="table">
@@ -27,3 +27,10 @@
     </section>
   } @else { <p class="error">No se pudo cargar la compra.</p> }
 </app-layout>
+
+<app-modal [open]="editingDate()" title="Corregir fecha de la compra" subtitle="Lo único editable de una compra registrada; nunca una fecha futura." (closed)="editingDate.set(false)">
+  <form class="form" (submit)="saveDate($event)">
+    <label class="field"><span class="label">Fecha y hora</span><input class="input" type="datetime-local" [value]="dateEditor.value()" (input)="dateEditor.value.set($any($event.target).value)" required /></label>
+    <app-button [name]="dateEditor.pending() ? 'Guardando…' : 'Guardar fecha'" [disabled]="dateEditor.pending()" />
+  </form>
+</app-modal>

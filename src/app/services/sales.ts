@@ -1,17 +1,18 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable, inject } from "@angular/core";
 import { firstValueFrom } from "rxjs";
-import { API_URL } from "../api/api-config";
+import { apiUrl } from "../api/api-config";
 import { Resources } from "../constants";
-import type { CreateSaleDto, ListState, Sale } from "../entities";
+import { toParams, type CreateSaleDto, CreateSaleReturnDto, ListQuery, ListState, Sale, SaleReturn } from "../entities";
 
+/** Contrato REST uniforme: listado paginado y filtrado en servidor, PUT /<recurso>/{id} con cuerpo plano. */
 @Injectable({ providedIn: "root" })
 export class SalesApi {
   private readonly http = inject(HttpClient);
-  private readonly url = `${API_URL}/${Resources.SALES}`;
+  private get url(): string { return `${apiUrl()}/${Resources.SALES}`; }
 
-  list(): Promise<ListState<Sale>> {
-    return firstValueFrom(this.http.get<ListState<Sale>>(this.url, { params: { limit: 100 } }));
+  list(query: ListQuery): Promise<ListState<Sale>> {
+    return firstValueFrom(this.http.get<ListState<Sale>>(this.url, { params: toParams(query) }));
   }
 
   get(id: number): Promise<Sale> {
@@ -27,13 +28,21 @@ export class SalesApi {
     return firstValueFrom(this.http.put<Sale>(`${this.url}/${id}`, { saleDate }));
   }
 
-  /** Anular devuelve el stock. */
+  /** Anular devuelve el stock. Rechazado (628) si ya tiene devoluciones. */
   remove(id: number): Promise<void> {
     return firstValueFrom(this.http.delete<void>(`${this.url}/${id}`));
   }
 
-  /** El PDF viaja con el token en la cabecera, por eso no basta un enlace. */
-  pdf(id: number): Promise<Blob> {
-    return firstValueFrom(this.http.get(`${this.url}/${id}/pdf`, { responseType: "blob" }));
+  returns(id: number): Promise<SaleReturn[]> {
+    return firstValueFrom(this.http.get<SaleReturn[]>(`${this.url}/${id}/${Resources.RETURNS}`));
+  }
+
+  createReturn(id: number, info: CreateSaleReturnDto): Promise<SaleReturn> {
+    return firstValueFrom(this.http.post<SaleReturn>(`${this.url}/${id}/${Resources.RETURNS}`, info));
+  }
+
+  /** El PDF viaja con el token en la cabecera, por eso no basta un enlace. `receipt` = tirilla de 80 mm. */
+  pdf(id: number, format: "invoice" | "receipt" = "invoice"): Promise<Blob> {
+    return firstValueFrom(this.http.get(`${this.url}/${id}/pdf`, { params: { format }, responseType: "blob" }));
   }
 }

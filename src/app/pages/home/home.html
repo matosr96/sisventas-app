@@ -5,23 +5,25 @@
   } @else if (summary.isError()) {
     <p class="error">No se pudieron cargar las cifras. Reintenta en unos segundos.</p>
   } @else {
+    @let s = summary.summary();
     <section class="metrics">
-      <app-metric-card label="Ventas de hoy" [value]="summary.todayCount()" icon="bx-receipt" [hint]="'ayer: ' + summary.yesterdayCount()" />
-      <app-metric-card label="Cobrado hoy" [value]="formatMoney(summary.todayTotal())" icon="bx-dollar-circle" tone="ok" [delta]="summary.todayDelta()" [hint]="summary.todayDelta() === null ? 'sin ventas ayer' : 'vs. ayer'" />
-      <app-metric-card label="Stock bajo" [value]="summary.lowStock().length" icon="bx-error" [tone]="summary.lowStock().length > 0 ? 'warn' : 'neutral'" [hint]="'de ' + summary.activeProductCount() + ' productos activos'" />
-      <app-metric-card label="Compras del mes" [value]="formatMoney(summary.monthPurchaseTotal())" icon="bx-cart-download" [hint]="summary.monthPurchaseCount() + ' órdenes'" />
+      <app-metric-card label="Ventas de hoy" [value]="s.todaySaleCount" icon="bx-receipt" [hint]="'ayer: ' + s.yesterdaySaleCount" />
+      <app-metric-card label="Cobrado hoy" [value]="formatMoney(s.todayTotal)" icon="bx-dollar-circle" tone="ok" [delta]="summary.todayDelta()" [hint]="summary.todayDelta() === null ? 'sin ventas ayer' : 'vs. ayer'" />
+      <app-metric-card label="Stock bajo" [value]="s.lowStockCount" icon="bx-error" [tone]="s.lowStockCount > 0 ? 'warn' : 'neutral'" [hint]="'de ' + s.activeProductCount + ' productos activos'" />
+      <app-metric-card label="Compras del mes" [value]="formatMoney(s.monthPurchaseTotal)" icon="bx-cart-download" [hint]="s.monthPurchaseCount + ' órdenes · inventario ' + formatMoney(s.inventoryValue)" />
     </section>
     <section class="panels">
       <article class="panel">
         <header class="panel_head">
           <h2 class="panel_title"><i class="bx bx-error"></i>Stock bajo</h2>
-          <a class="panel_link" [routerLink]="routes.PRODUCTS">Ver productos</a>
+          <a class="panel_link" [routerLink]="routes.PRODUCTS" [queryParams]="{ lowStock: 'true' }">Ver productos</a>
         </header>
-        @if (summary.lowStock().length === 0) {
+        @if (lowStock.isLoading()) { <app-skeleton [rows]="3" /> }
+        @else if (lowStock.items().length === 0) {
           <p class="muted">Ningún producto está por debajo de su mínimo.</p>
         } @else {
           <ul class="list">
-            @for (product of summary.lowStock(); track product.id) {
+            @for (product of lowStock.items(); track product.id) {
               <li class="item">
                 <a class="item_link" [routerLink]="[routes.PRODUCTS, product.id]">{{ product.name }}<span class="sku">{{ product.sku }}</span></a>
                 <app-badge [label]="product.currentStock + ' / mín. ' + product.lowStock" [tone]="product.currentStock <= 0 ? 'danger' : 'warn'" />
@@ -35,13 +37,14 @@
           <h2 class="panel_title"><i class="bx bx-time-five"></i>Últimas ventas</h2>
           <a class="panel_link" [routerLink]="routes.SALES">Ver ventas</a>
         </header>
-        @if (summary.recentSales().length === 0) {
+        @if (recent.isLoading()) { <app-skeleton [rows]="3" /> }
+        @else if (recent.items().length === 0) {
           <p class="muted">Todavía no hay ventas. <a class="inline_link" [routerLink]="[routes.SALES, 'nueva']">Registra la primera.</a></p>
         } @else {
           <ul class="list">
-            @for (sale of summary.recentSales(); track sale.id) {
+            @for (sale of recent.items(); track sale.id) {
               <li class="item">
-                <a class="item_link" [routerLink]="[routes.SALES, sale.id]">{{ sale.saleNumber }}<span class="sku">{{ sale.items.length }} líneas</span></a>
+                <a class="item_link" [routerLink]="[routes.SALES, sale.id]">{{ sale.saleNumber }}<span class="sku">{{ sale.userName }} · {{ paymentMethodLabel(sale.paymentMethod) }}</span></a>
                 <span class="muted">{{ formatDateTime(sale.saleDate) }}</span>
                 <span class="amount">{{ formatMoney(sale.total) }}</span>
               </li>

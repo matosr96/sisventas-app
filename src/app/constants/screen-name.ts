@@ -6,6 +6,8 @@ export const ScreenName = {
   PURCHASE: "purchase",
   SALE: "sale",
   USER: "user",
+  MOVEMENT: "movement",
+  AUDIT: "audit",
 } as const;
 
 export type ScreenNameValue = (typeof ScreenName)[keyof typeof ScreenName];

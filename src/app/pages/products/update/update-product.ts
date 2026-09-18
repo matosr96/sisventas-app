@@ -23,6 +23,7 @@ import { updateProduct } from "../../../operations/product/update-product";
           <app-select name="categoryId" label="Categoría" [options]="categoryOptions()" [(value)]="op.form.categoryId" placeholder="Sin categoría" />
           <app-select name="status" label="Estado" [options]="statusOptions" [(value)]="op.form.status" [required]="true" />
         </div>
+        <app-input name="image" label="Imagen (URL, opcional)" [(value)]="op.form.image" placeholder="https://…/producto.jpg" />
         <p class="hint">El stock no se edita aquí: se mueve con compras, ventas, anulaciones o un ajuste desde la ficha.</p>
         <app-button [name]="op.pending() ? 'Guardando…' : 'Guardar cambios'" [disabled]="op.pending()" />
       </form>
@@ -38,7 +39,7 @@ import { updateProduct } from "../../../operations/product/update-product";
 export class UpdateProduct implements OnInit {
   readonly product = input.required<Product>();
   readonly closed = output<void>();
-  private readonly categories = listCategories(() => true);
+  private readonly categories = listCategories({ limit: 100 });
   readonly categoryOptions = computed<SelectOption<number>[]>(() =>
     this.categories.items().map((category) => ({ value: category.id, label: category.name }))
   );

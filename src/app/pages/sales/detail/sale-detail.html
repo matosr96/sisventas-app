@@ -1,31 +1,94 @@
 <app-layout>
   @if (detail.isLoading()) { <app-skeleton variant="detail" [count]="3" [rows]="3" /> }
   @else if (detail.sale(); as sale) {
-    <app-header-page [title]="'Factura ' + sale.saleNumber" icon="bx-receipt" [items]="['Inicio', 'Ventas', sale.saleNumber]" [searchable]="false" badge="Registrada" badgeTone="ok">
+    <app-header-page [title]="'Factura ' + sale.saleNumber" icon="bx-receipt" [items]="['Inicio', 'Ventas', sale.saleNumber]" [searchable]="false"
+      [badge]="returns.items().length > 0 ? 'Con devoluciones' : 'Registrada'" [badgeTone]="returns.items().length > 0 ? 'warn' : 'ok'">
       <div actions class="actions">
-        <app-button [name]="pdf.pending() ? 'Generando…' : 'PDF'" type="button" variant="ghost" icon="bx-file" [disabled]="pdf.pending()" (clicked)="pdf.open(saleId())" />
-        @if (auth.isAdmin()) { <app-button name="Anular" type="button" variant="danger" icon="bx-trash" (clicked)="voidSale()" /> }
+        <app-button [name]="pdf.pending() ? 'Generando…' : 'Tirilla'" type="button" variant="ghost" icon="bx-printer" [disabled]="pdf.pending()" (clicked)="pdf.print(saleId(), 'receipt')" />
+        <app-button name="Factura PDF" type="button" variant="ghost" icon="bx-file" [disabled]="pdf.pending()" (clicked)="pdf.open(saleId(), 'invoice')" />
+        @if (canReturn()) { <app-button name="Devolver" type="button" variant="ghost" icon="bx-undo" (clicked)="returning.set(true)" /> }
+        @if (auth.isAdmin() && returns.items().length === 0) { <app-button name="Anular" type="button" variant="danger" icon="bx-trash" (clicked)="voidSale()" /> }
       </div>
     </app-header-page>
     <a class="back" [routerLink]="routes.SALES"><i class="bx bx-arrow-back"></i>Volver a ventas</a>
+    @if (justCreated()) {
+      <div class="notice"><i class="bx bx-check-circle"></i><span>Venta cobrada. ¿Imprimes la tirilla para el cliente?</span>
+        <app-button name="Imprimir tirilla" type="button" icon="bx-printer" (clicked)="pdf.print(saleId(), 'receipt'); justCreated.set(false)" />
+        <button type="button" class="notice_close" (click)="justCreated.set(false)" aria-label="Cerrar"><i class="bx bx-x"></i></button>
+      </div>
+    }
     <section class="card">
       <div class="facts">
-        <div class="fact"><span class="fact_label">Fecha</span><span class="fact_value">{{ formatDateTime(sale.saleDate) }}</span></div>
-        <div class="fact"><span class="fact_label">Líneas</span><span class="fact_value">{{ sale.items.length }}</span></div>
-        <div class="fact"><span class="fact_label">Unidades</span><span class="fact_value">{{ units() }}</span></div>
+        <div class="fact"><span class="fact_label">Fecha</span><span class="fact_value">{{ formatDateTime(sale.saleDate) }} <button type="button" class="fact_edit" (click)="openDateEditor()" title="Corregir fecha" aria-label="Corregir fecha"><i class="bx bx-edit-alt"></i></button></span></div>
+        <div class="fact"><span class="fact_label">Vendedor</span><span class="fact_value">{{ sale.userName }}</span></div>
+        <div class="fact"><span class="fact_label">Cliente</span><span class="fact_value">{{ sale.customerName || '—' }}</span></div>
+        <div class="fact"><span class="fact_label">Pago</span><span class="fact_value"><app-badge [label]="paymentMethodLabel(sale.paymentMethod)" tone="info" /></span></div>
+        <div class="fact"><span class="fact_label">Unidades</span><span class="fact_value">{{ units() }}@if (returnedUnits() > 0) { <span class="muted"> · {{ returnedUnits() }} devueltas</span> }</span></div>
       </div>
       <table class="table">
-        <thead><tr><th>SKU</th><th>Producto</th><th class="num">Cantidad</th><th class="num">Precio unit.</th><th class="num">Subtotal</th></tr></thead>
+        <thead><tr><th>SKU</th><th>Producto</th><th class="num">Cantidad</th><th class="num">Devueltas</th><th class="num">Precio unit.</th><th class="num">Subtotal</th></tr></thead>
         <tbody>
           @for (item of sale.items; track item.id) {
-            <tr><td class="muted">{{ item.productSku }}</td><td>{{ item.productName }}</td><td class="num">{{ item.quantity }}</td><td class="num">{{ formatMoney(item.unitPrice) }}</td><td class="num">{{ formatMoney(item.subtotal) }}</td></tr>
+            <tr><td class="muted">{{ item.productSku }}</td><td>{{ item.productName }}</td><td class="num">{{ item.quantity }}</td><td class="num" [class.muted]="item.returnedQuantity === 0">{{ item.returnedQuantity }}</td><td class="num">{{ formatMoney(item.unitPrice) }}</td><td class="num">{{ formatMoney(item.subtotal) }}</td></tr>
           }
         </tbody>
       </table>
       <div class="totals">
-        <span class="totals_row"><span>Subtotal</span><span>{{ formatMoney(sale.total) }}</span></span>
+        <span class="totals_row"><span>Subtotal</span><span>{{ formatMoney(sale.subtotal) }}</span></span>
+        @if (sale.discount > 0) { <span class="totals_row"><span>Descuento</span><span>-{{ formatMoney(sale.discount) }}</span></span> }
+        @if (sale.taxRate > 0) { <span class="totals_row"><span>Impuesto ({{ formatPercent(sale.taxRate) }})</span><span>{{ formatMoney(sale.tax) }}</span></span> }
         <span class="totals_row grand"><span>Total</span><span>{{ formatMoney(sale.total) }}</span></span>
+        @if (sale.amountPaid !== null) {
+          <span class="totals_row"><span>Recibido</span><span>{{ formatMoney(sale.amountPaid) }}</span></span>
+          <span class="totals_row"><span>Cambio</span><span>{{ formatMoney(sale.changeAmount) }}</span></span>
+        }
+        @if (returns.returnedTotal() > 0) { <span class="totals_row returned"><span>Devuelto</span><span>-{{ formatMoney(returns.returnedTotal()) }}</span></span> }
       </div>
     </section>
+    @if (returns.items().length > 0) {
+      <section class="card">
+        <h2 class="section_title"><i class="bx bx-undo"></i>Devoluciones</h2>
+        @for (item of returns.items(); track item.id) {
+          <article class="return">
+            <header class="return_head"><strong>{{ item.returnNumber }}</strong><span class="muted">{{ formatDateTime(item.createdAt) }}</span><span class="return_total">-{{ formatMoney(item.total) }}</span></header>
+            <p class="muted">{{ item.reason }}</p>
+            <ul class="return_lines">@for (line of item.items; track line.id) { <li>{{ line.quantity }} × {{ line.productName }} <span class="muted">({{ formatMoney(line.unitPrice) }} c/u)</span></li> }</ul>
+          </article>
+        }
+      </section>
+    }
   } @else { <p class="error">No se pudo cargar la venta.</p> }
 </app-layout>
+
+@if (detail.sale(); as sale) {
+  <app-modal [open]="returning()" variant="drawer" title="Registrar devolución" [subtitle]="'Factura ' + sale.saleNumber + ' · las unidades vuelven al stock'" (closed)="returning.set(false); returns.reset()">
+    <form class="form" (submit)="saveReturn($event)">
+      <table class="table">
+        <thead><tr><th>Producto</th><th class="num">Vendidas</th><th class="num">Devolver</th></tr></thead>
+        <tbody>
+          @for (item of sale.items; track item.id) {
+            @let available = item.quantity - item.returnedQuantity;
+            <tr>
+              <td>{{ item.productName }}<span class="muted block">{{ formatMoney(item.unitPrice) }} c/u</span></td>
+              <td class="num">{{ available }}@if (item.returnedQuantity > 0) { <span class="muted"> (de {{ item.quantity }})</span> }</td>
+              <td class="num"><input class="qty" type="number" min="0" [max]="available" step="1" [disabled]="available === 0" [value]="returns.quantities()[item.id] ?? ''" (input)="onReturnQuantity(item.id, available, $event)" aria-label="Unidades a devolver" /></td>
+            </tr>
+          }
+        </tbody>
+      </table>
+      <app-input name="reason" label="Motivo" [value]="returns.reason()" (valueChange)="returns.reason.set($event)" [required]="true" placeholder="Producto dañado, cliente se arrepintió…" />
+      <div class="totals">
+        <span class="totals_row grand"><span>A devolver</span><span>{{ formatMoney(returns.requestedTotal(sale)) }}</span></span>
+      </div>
+      <p class="hint">Se devuelve al precio congelado de cada línea; el descuento de la venta no se prorratea.</p>
+      <app-button [name]="returns.pending() ? 'Registrando…' : 'Registrar devolución'" icon="bx-undo" [disabled]="returns.pending() || returns.requested().length === 0" />
+    </form>
+  </app-modal>
+}
+
+<app-modal [open]="editingDate()" title="Corregir fecha de la venta" subtitle="Lo único editable de una venta registrada; nunca una fecha futura." (closed)="editingDate.set(false)">
+  <form class="form" (submit)="saveDate($event)">
+    <label class="field"><span class="label">Fecha y hora</span><input class="input" type="datetime-local" [value]="dateEditor.value()" (input)="dateEditor.value.set($any($event.target).value)" required /></label>
+    <app-button [name]="dateEditor.pending() ? 'Guardando…' : 'Guardar fecha'" [disabled]="dateEditor.pending()" />
+  </form>
+</app-modal>

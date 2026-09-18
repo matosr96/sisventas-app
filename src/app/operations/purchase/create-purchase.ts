@@ -3,10 +3,8 @@ import { Router } from "@angular/router";
 import { QueryClient } from "../../api/query-client";
 import { Toast } from "../../components/shared/toaster/toast";
 import { PrivateRoutes, Resources } from "../../constants";
-import {
-  EmptyProductsState, EmptySuppliersState, ProductStatus, SupplierStatus, type Product, type PurchaseItemDto,
-} from "../../entities";
-import { ProductsApi, PurchasesApi, SuppliersApi } from "../../services";
+import { EmptyQueryState, EmptySuppliersState, SupplierStatus, type Product, type PurchaseItemDto } from "../../entities";
+import { PurchasesApi, SuppliersApi } from "../../services";
 import { apiErrorMessage } from "../../utils";
 import { catalogPicker } from "../catalog-picker";
 import { listResource, safeValue } from "../list-resource";
@@ -21,25 +19,23 @@ export interface PurchaseLine { product: Product; quantity: number; unitCost: nu
  */
 export function createPurchase() {
   const purchasesApi = inject(PurchasesApi);
-  const productsApi = inject(ProductsApi);
   const suppliersApi = inject(SuppliersApi);
   const queryClient = inject(QueryClient);
   const toast = inject(Toast);
   const router = inject(Router);
+  const picker = catalogPicker();
 
-  const products = listResource(Resources.PRODUCTS, () => productsApi.list(), EmptyProductsState);
-  const suppliers = listResource(Resources.SUPPLIERS, () => suppliersApi.list(), EmptySuppliersState);
-  const catalog = safeValue(products, EmptyProductsState);
-  const supplierList = safeValue(suppliers, EmptySuppliersState);
-  const purchasable = computed(() => catalog().items.filter((product) => product.status === ProductStatus.ACTIVE));
-  const activeSuppliers = computed(() => supplierList().items.filter((supplier) => supplier.status === SupplierStatus.ACTIVE));
-  const picker = catalogPicker(purchasable);
+  const suppliers = listResource(Resources.SUPPLIERS,
+    () => suppliersApi.list({ ...EmptyQueryState, limit: 100, sort: "name", dir: "asc", filters: { status: SupplierStatus.ACTIVE } }),
+    EmptySuppliersState);
+  const activeSuppliers = computed(() => safeValue(suppliers, EmptySuppliersState)().items);
 
   const supplierId = signal<number | null>(null);
   const lines = signal<PurchaseItemDto[]>([]);
+  const products = signal<Map<number, Product>>(new Map());
   const pending = signal(false);
 
-  const productById = (id: number | null): Product | undefined => purchasable().find((product) => product.id === id);
+  const productById = (id: number | null): Product | undefined => (id == null ? undefined : products().get(id));
   const cart = computed<PurchaseLine[]>(() =>
     lines().flatMap((line) => {
       const product = productById(line.productId);
@@ -61,6 +57,7 @@ export function createPurchase() {
   const setUnitCost = (productId: number, unitCost: number | null): void => patch(productId, { unitCost });
 
   const add = (product: Product): void => {
+    products.update((map) => new Map(map).set(product.id, product));
     const current = quantityOf(product.id);
     if (current === 0) {
       lines.update((list) => [...list, { productId: product.id, quantity: 1, unitCost: product.purchasePrice }]);
@@ -81,6 +78,7 @@ export function createPurchase() {
 
   const submit = async (event: Event): Promise<void> => {
     event.preventDefault();
+    if (pending()) return;
     const items = lines().filter((line) => line.productId != null && (line.quantity ?? 0) > 0 && line.unitCost != null);
     if (supplierId() == null) { toast.error("Elige el proveedor."); return; }
     if (items.length === 0) { toast.error("Añade al menos un producto con cantidad y costo."); return; }
@@ -88,7 +86,7 @@ export function createPurchase() {
     pending.set(true);
     try {
       const purchase = await purchasesApi.create({ supplierId: supplierId(), items });
-      queryClient.invalidate(Resources.PURCHASES, Resources.PRODUCTS);
+      queryClient.invalidate(Resources.PURCHASES, Resources.PRODUCTS, Resources.REPORTS);
       toast.success(`Compra ${purchase.purchaseNumber} registrada.`);
       await router.navigate([PrivateRoutes.PURCHASES, purchase.id]);
     } catch (error) {
@@ -99,9 +97,9 @@ export function createPurchase() {
   };
 
   return {
-    ...picker, purchasable, activeSuppliers, supplierId, cart, itemCount, total, quantityOf,
+    ...picker, activeSuppliers, supplierId, cart, itemCount, total, quantityOf,
     add, addFromSearch, increment, decrement, setQuantity, setUnitCost, remove, clear, pending, submit,
-    isLoading: computed(() => products.isLoading() || suppliers.isLoading()),
-    isError: computed(() => products.error() != null || suppliers.error() != null),
+    isLoading: computed(() => picker.isLoading() || suppliers.isLoading()),
+    isError: computed(() => picker.isError() || suppliers.error() != null),
   };
 }

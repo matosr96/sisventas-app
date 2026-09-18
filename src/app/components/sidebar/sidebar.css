@@ -5,7 +5,9 @@
 .collapse:hover { background-color: var(--white-one); color: var(--text-color); }
 /* Contraído: logo y botón apilados; sin el botón no habría forma de volver a expandir. */
 .collapsed .brand { flex-direction: column; gap: 0.8rem; }
-.nav { display: flex; flex-direction: column; gap: 0.4rem; flex: 1; }
+.nav { display: flex; flex-direction: column; gap: 0.4rem; flex: 1; overflow-y: auto; }
+.section { padding: 1.2rem 1.2rem 0.4rem; font-size: 1.1rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-muted); }
+.collapsed .section { display: none; }
 .link { display: flex; align-items: center; gap: 1.2rem; padding: 1rem 1.2rem; border-radius: var(--radius-sm); color: var(--text-muted); font-weight: 500; transition: background-color .2s ease, color .2s ease; width: 100%; text-align: left; }
 .link:hover { background-color: var(--white-one); color: var(--text-color); }
 .link.active { background-color: var(--blue-soft); color: var(--blue-dark); }

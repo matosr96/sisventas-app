@@ -15,3 +15,11 @@
 .grand { padding-top: 0.8rem; border-top: 1px solid var(--border-color); color: var(--text-color); font-size: 2rem; font-weight: 700; }
 .error { padding: 2rem; border-radius: var(--radius); background-color: var(--red-soft); color: var(--red-dark); }
 @media (max-width: 768px) { .facts { grid-template-columns: 1fr; } .card { overflow-x: auto; } .totals { min-width: 0; align-self: stretch; } .actions { flex-direction: column; } }
+.fact_value { display: flex; align-items: center; gap: 0.6rem; }
+.fact_edit { display: flex; padding: 0.3rem; border-radius: var(--radius-sm); color: var(--text-muted); font-size: 1.6rem; }
+.fact_edit:hover { background-color: var(--blue-soft); color: var(--blue-dark); }
+.form { display: flex; flex-direction: column; gap: 1.6rem; }
+.field { display: flex; flex-direction: column; gap: 0.6rem; }
+.label { font-size: 1.3rem; font-weight: 500; color: var(--text-muted); }
+.input { padding: 1rem 1.2rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background-color: var(--field-bg); color: var(--text-color); }
+.input:focus { outline: none; border-color: var(--blue-bg); box-shadow: 0 0 0 3px var(--blue-soft); }

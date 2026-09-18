@@ -1,19 +1,18 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable, inject } from "@angular/core";
 import { firstValueFrom } from "rxjs";
-import { API_URL } from "../api/api-config";
+import { apiUrl } from "../api/api-config";
 import { Resources } from "../constants";
-import type { Supplier, CreateSupplierDto, UpdateSupplierDto, ListState } from "../entities";
+import { toParams, type CreateSupplierDto, ListQuery, ListState, Supplier, UpdateSupplierDto } from "../entities";
 
-/** Contrato REST uniforme. Excepción documentada: la API actualiza con PUT /<recurso>/{id} y el cuerpo plano. */
+/** Contrato REST uniforme: listado paginado y filtrado en servidor, PUT /<recurso>/{id} con cuerpo plano. */
 @Injectable({ providedIn: "root" })
 export class SuppliersApi {
   private readonly http = inject(HttpClient);
-  private readonly url = `${API_URL}/${Resources.SUPPLIERS}`;
+  private get url(): string { return `${apiUrl()}/${Resources.SUPPLIERS}`; }
 
-  /** La API acota limit a 100; la paginación y la búsqueda se hacen en el cliente sobre items. */
-  list(): Promise<ListState<Supplier>> {
-    return firstValueFrom(this.http.get<ListState<Supplier>>(this.url, { params: { limit: 100 } }));
+  list(query: ListQuery): Promise<ListState<Supplier>> {
+    return firstValueFrom(this.http.get<ListState<Supplier>>(this.url, { params: toParams(query) }));
   }
 
   get(id: number): Promise<Supplier> {

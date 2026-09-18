@@ -1,12 +1,18 @@
 <app-layout>
-  <app-header-page title="Ventas" icon="bx-receipt" [items]="['Inicio', 'Ventas']" searchPlaceholder="Número de factura…" nameButton="Registrar venta" [(searchTerm)]="list.searchTerm" (create)="create()" />
+  <app-header-page title="Ventas" icon="bx-receipt" [items]="['Inicio', 'Ventas']" searchPlaceholder="Número o cliente…" nameButton="Registrar venta" [(searchTerm)]="list.searchTerm" (create)="create()">
+    <ng-container filters>
+      <app-date-range [value]="range()" (valueChange)="setRange($event)" />
+      <app-filter-chips label="Pago" [options]="paymentOptions" [value]="paymentFilter()" (valueChange)="list.setFilter('paymentMethod', $event)" />
+    </ng-container>
+  </app-header-page>
   @if (list.isLoading()) { <app-skeleton /> }
   @else if (list.isError()) { <p class="error">No se pudieron cargar las ventas. Reintenta en unos segundos.</p> }
-  @else if (list.items().length === 0) {
+  @else if (list.count() === 0 && !list.hasFilters()) {
     <app-empty title="Ventas" copy="Registra la primera venta: elige productos y cantidades; el precio y el total los pone el sistema." buttonName="Registrar venta" (create)="create()" />
-  } @else if (rows().length === 0) {
+  } @else if (list.count() === 0) {
     <app-empty variant="no-results" (clear)="list.clearFilters()" />
   } @else {
-    <app-table [data]="rows()" [headers]="['Número', 'Fecha', 'Líneas', 'Total']" [keys]="['saleNumber', 'dateLabel', 'lines', 'totalLabel']" [numericKeys]="['lines', 'totalLabel']" [screenName]="screen" (rowClick)="open($event)" (remove)="remove($event)" />
+    <app-table [data]="rows()" [headers]="['Número', 'Fecha', 'Vendedor', 'Líneas', 'Pago', 'Total']" [keys]="['number', 'date', 'userName', 'lines', 'payment', 'total']" [numericKeys]="['lines', 'total']" [screenName]="screen"
+      [total]="list.count()" [query]="list.tableQuery()" [sortableKeys]="['number', 'date', 'total']" (queryChange)="list.onQuery($event)" (rowClick)="open($event)" (remove)="remove($event)" />
   }
 </app-layout>

@@ -5,8 +5,12 @@ export const Resources = {
   SUPPLIERS: "suppliers",
   PURCHASES: "purchases",
   SALES: "sales",
+  RETURNS: "returns",
   USERS: "users",
   MOVEMENTS: "movements",
+  AUDITS: "audits",
+  REPORTS: "reports",
+  SETTINGS: "settings",
 } as const;
 
 export type Resource = (typeof Resources)[keyof typeof Resources];

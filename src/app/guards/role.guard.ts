@@ -4,10 +4,10 @@ import { PrivateRoutes } from "../constants";
 import type { RoleNameValue } from "../entities";
 import { AuthStore } from "../store/auth";
 
-/** Sin el rol, a Inicio. Los permisos viven en las rutas (app.routes.ts) y en el menú, no en las pantallas. */
+/** Sin el rol, a la página de "sin permiso". Los permisos viven en las rutas (app.routes.ts) y en el menú, no en las pantallas. */
 export const roleGuard = (...roles: RoleNameValue[]): CanActivateFn => () => {
   const auth = inject(AuthStore);
   const router = inject(Router);
   const allowed = auth.roles().some((role) => roles.includes(role));
-  return allowed ? true : router.createUrlTree([PrivateRoutes.HOME]);
+  return allowed ? true : router.createUrlTree([PrivateRoutes.FORBIDDEN]);
 };

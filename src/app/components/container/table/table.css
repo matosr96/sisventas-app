@@ -4,7 +4,8 @@
 th, td { padding: 1.1rem 1.6rem; text-align: left; border-bottom: 1px solid var(--border-color); white-space: nowrap; }
 th { position: sticky; top: 0; z-index: 1; padding: 0; font-size: 1.2rem; font-weight: 600; color: var(--text-muted); background-color: var(--white-two); text-transform: uppercase; letter-spacing: 0.04em; box-shadow: 0 1px 0 var(--border-color); }
 .sort { display: flex; align-items: center; gap: 0.4rem; width: 100%; padding: 1.1rem 1.6rem; font: inherit; color: inherit; text-transform: inherit; letter-spacing: inherit; }
-.sort:hover { color: var(--text-color); }
+.sort:hover:not(:disabled) { color: var(--text-color); }
+.static { cursor: default; }
 .sort i { font-size: 1.5rem; opacity: 0.35; }
 .sort.active { color: var(--text-color); }
 .sort.active i { opacity: 1; color: var(--blue-bg); }

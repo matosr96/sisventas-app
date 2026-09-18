@@ -22,6 +22,7 @@ import { createProduct } from "../../../operations/product/create-product";
           <app-number-input name="lowStock" label="Stock mínimo (aviso)" [(value)]="op.form.lowStock" [min]="0" step="1" />
         </div>
         <app-select name="categoryId" label="Categoría" [options]="categoryOptions()" [(value)]="op.form.categoryId" placeholder="Sin categoría" />
+        <app-input name="image" label="Imagen (URL, opcional)" [(value)]="op.form.image" placeholder="https://…/producto.jpg" />
         <app-button [name]="op.pending() ? 'Guardando…' : 'Guardar producto'" [disabled]="op.pending()" />
       </form>
     </app-modal>
@@ -36,7 +37,7 @@ export class CreateProduct {
   readonly open = input.required<boolean>();
   readonly closed = output<void>();
   readonly op = createProduct();
-  private readonly categories = listCategories(() => true);
+  private readonly categories = listCategories({ limit: 100 });
   readonly categoryOptions = computed<SelectOption<number>[]>(() =>
     this.categories.items().map((category) => ({ value: category.id, label: category.name }))
   );

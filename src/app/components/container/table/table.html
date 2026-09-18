@@ -5,13 +5,15 @@
         <tr>
           @for (header of headers(); track header; let i = $index) {
             <th [class.num]="isNumeric(keys()[i])" [attr.aria-sort]="sortKey() === keys()[i] ? (sortDirection() === 'asc' ? 'ascending' : 'descending') : null">
-              <button type="button" class="sort" [class.active]="sortKey() === keys()[i]" (click)="sortBy(keys()[i])">
+              <button type="button" class="sort" [class.active]="sortKey() === keys()[i]" [class.static]="!isSortable(keys()[i])" (click)="sortBy(keys()[i])" [disabled]="!isSortable(keys()[i])">
                 {{ header }}
-                <i class="bx" [class]="'bx ' + (sortKey() === keys()[i] ? (sortDirection() === 'asc' ? 'bx-up-arrow-alt' : 'bx-down-arrow-alt') : 'bx-sort-alt-2')"></i>
+                @if (isSortable(keys()[i])) {
+                  <i class="bx" [class]="'bx ' + (sortKey() === keys()[i] ? (sortDirection() === 'asc' ? 'bx-up-arrow-alt' : 'bx-down-arrow-alt') : 'bx-sort-alt-2')"></i>
+                }
               </button>
             </th>
           }
-          <th class="actions_col">Acciones</th>
+          @if (actions()) { <th class="actions_col">Acciones</th> }
         </tr>
       </thead>
       <tbody>
@@ -23,9 +25,11 @@
                 @else { {{ render(row[key]) }} }
               </td>
             }
-            <td class="actions_col">
-              <app-actions [screenName]="screenName()" (edit)="edit.emit(row)" (remove)="remove.emit(row)" />
-            </td>
+            @if (actions()) {
+              <td class="actions_col">
+                <app-actions [screenName]="screenName()" (edit)="edit.emit(row)" (remove)="remove.emit(row)" />
+              </td>
+            }
           </tr>
         }
       </tbody>

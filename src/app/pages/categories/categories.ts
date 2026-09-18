@@ -19,12 +19,12 @@ import { UpdateCategory } from "./update/update-category";
 export class Categories {
   readonly auth = inject(AuthStore);
   readonly screen = ScreenName.CATEGORY;
-  readonly list = listCategories((item, term) => item.name.toLowerCase().includes(term));
+  readonly list = listCategories();
   readonly remover = deleteItem();
   readonly creating = signal(false);
   readonly editing = signal<Category | null>(null);
-  readonly rows = computed<Row[]>(() => this.list.filtered().map((item) => ({ ...item, icon: item.icon || "—" })));
+  readonly rows = computed<Row[]>(() => this.list.items().map((item) => ({ ...item, icon: item.icon || "—" })));
 
   edit(row: Row): void { this.editing.set(this.list.items().find((item) => item.id === row["id"]) ?? null); }
-  remove(row: Row): void { this.remover.remove(this.screen, Number(row["id"])); }
+  remove(row: Row): void { void this.remover.remove(this.screen, Number(row["id"])); }
 }

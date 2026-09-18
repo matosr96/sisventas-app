@@ -9,6 +9,8 @@ export type StockMovementTypeValue = (typeof StockMovementType)[keyof typeof Sto
 export interface StockMovement {
   id: number;
   productId: number;
+  productSku: string;
+  productName: string;
   type: StockMovementTypeValue;
   quantity: number;      // con signo: positivo entra, negativo sale
   stockAfter: number;

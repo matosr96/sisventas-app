@@ -2,26 +2,27 @@ import { inject, signal } from "@angular/core";
 import { QueryClient } from "../../api/query-client";
 import { Toast } from "../../components/shared/toaster/toast";
 import { Resources } from "../../constants";
-import { EmptySignupState, type SignupDto } from "../../entities";
-import { AuthApi } from "../../services";
+import { EmptyCreateUserState, type CreateUserDto } from "../../entities";
+import { UsersApi } from "../../services";
 import { apiErrorMessage } from "../../utils";
 
-/** El alta es el signup público de la API: nace con rol vendedor; el rol se cambia después. */
+/** Alta por administrador (POST /users): elige el rol de entrada y no pasa por el límite del registro público. */
 export function createUser() {
-  const api = inject(AuthApi);
+  const api = inject(UsersApi);
   const queryClient = inject(QueryClient);
   const toast = inject(Toast);
-  const form: SignupDto = { ...EmptySignupState };
+  const form: CreateUserDto = { ...EmptyCreateUserState };
   const pending = signal(false);
 
   const submit = async (event: Event): Promise<boolean> => {
     event.preventDefault();
+    if (pending()) return false;
     pending.set(true);
     try {
-      await api.signup({ ...form });
+      await api.create({ ...form, photo: form.photo.trim() });
       queryClient.invalidate(Resources.USERS);
       toast.success("Usuario creado correctamente.");
-      Object.assign(form, { ...EmptySignupState });
+      Object.assign(form, { ...EmptyCreateUserState });
       return true;
     } catch (error) {
       toast.error(apiErrorMessage(error));

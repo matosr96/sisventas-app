@@ -11,7 +11,7 @@
       <section class="catalog">
         <div class="catalog_bar">
           <!-- Enter (teclado o lector de código de barras) añade el producto: keydown lo captura y el form cubre el envío implícito. -->
-          <form class="search" (submit)="onSearchEnter($event)">
+          <form class="search" [class.searching]="op.isSearching()" (submit)="onSearchEnter($event)">
             <i class="bx bx-barcode-reader"></i>
             <input class="search_input" type="search" placeholder="SKU o nombre; Enter añade el producto" [value]="op.searchTerm()" (input)="onSearch($event)" (keydown.enter)="onSearchEnter($event)" aria-label="Buscar producto" />
           </form>

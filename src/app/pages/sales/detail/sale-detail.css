@@ -1,17 +1,41 @@
-.actions { display: flex; gap: 1.2rem; }
+.actions { display: flex; flex-wrap: wrap; gap: 1.2rem; }
 .back { display: inline-flex; align-items: center; gap: 0.6rem; color: var(--text-muted); margin-bottom: 1.6rem; }
 .back:hover { color: var(--blue-bg); }
-.card { display: flex; flex-direction: column; gap: 2rem; padding: 2.4rem; background-color: var(--main-color); border-radius: var(--radius); box-shadow: var(--box-shadow); }
-.facts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.6rem; }
+.notice { display: flex; align-items: center; gap: 1.2rem; padding: 1.2rem 1.6rem; margin-bottom: 1.6rem; border-radius: var(--radius); background-color: var(--green-soft); color: var(--green-dark); font-weight: 500; }
+.notice i { font-size: 2.2rem; }
+.notice span { flex: 1; }
+.notice_close { display: flex; color: inherit; font-size: 2rem; }
+.card { display: flex; flex-direction: column; gap: 2rem; padding: 2.4rem; margin-bottom: 1.6rem; background-color: var(--main-color); border-radius: var(--radius); box-shadow: var(--box-shadow); }
+.section_title { display: flex; align-items: center; gap: 0.8rem; font-size: 1.6rem; font-weight: 600; }
+.section_title i { color: var(--blue-bg); }
+.facts { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1.6rem; }
 .fact { display: flex; flex-direction: column; gap: 0.4rem; }
 .fact_label { font-size: 1.3rem; color: var(--text-muted); }
-.fact_value { font-size: 1.8rem; font-weight: 600; }
-.table th, .table td { padding: 1rem 1.2rem; text-align: left; border-bottom: 1px solid var(--border-color); }
+.fact_value { display: flex; align-items: center; gap: 0.6rem; font-size: 1.6rem; font-weight: 600; }
+.fact_edit { display: flex; padding: 0.3rem; border-radius: var(--radius-sm); color: var(--text-muted); font-size: 1.6rem; }
+.fact_edit:hover { background-color: var(--blue-soft); color: var(--blue-dark); }
+.table th, .table td { padding: 1rem 1.2rem; text-align: left; border-bottom: 1px solid var(--border-color); vertical-align: top; }
 .table th { font-size: 1.2rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; background-color: var(--white-two); }
 .num { text-align: right; }
-.muted { color: var(--text-muted); }
+.muted { color: var(--text-muted); font-weight: 400; }
+.block { display: block; font-size: 1.2rem; }
 .totals { display: flex; flex-direction: column; gap: 0.6rem; align-self: flex-end; min-width: 28rem; }
 .totals_row { display: flex; justify-content: space-between; gap: 2rem; color: var(--text-muted); }
 .grand { padding-top: 0.8rem; border-top: 1px solid var(--border-color); color: var(--text-color); font-size: 2rem; font-weight: 700; }
+.returned { color: var(--amber-dark); font-weight: 600; }
+.return { display: flex; flex-direction: column; gap: 0.4rem; padding: 1.2rem 0; border-top: 1px solid var(--border-color); }
+.return_head { display: flex; align-items: center; gap: 1.2rem; }
+.return_total { margin-left: auto; font-weight: 600; color: var(--amber-dark); }
+.return_lines { display: flex; flex-direction: column; gap: 0.2rem; font-size: 1.3rem; }
+.form { display: flex; flex-direction: column; gap: 1.6rem; }
+.form .totals { align-self: stretch; min-width: 0; }
+.qty { width: 7rem; padding: 0.5rem 0.8rem; text-align: right; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background-color: var(--field-bg); color: var(--text-color); }
+.qty:focus { outline: none; border-color: var(--blue-bg); box-shadow: 0 0 0 3px var(--blue-soft); }
+.qty:disabled { opacity: 0.4; }
+.field { display: flex; flex-direction: column; gap: 0.6rem; }
+.label { font-size: 1.3rem; font-weight: 500; color: var(--text-muted); }
+.input { padding: 1rem 1.2rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background-color: var(--field-bg); color: var(--text-color); }
+.input:focus { outline: none; border-color: var(--blue-bg); box-shadow: 0 0 0 3px var(--blue-soft); }
+.hint { font-size: 1.3rem; color: var(--text-muted); }
 .error { padding: 2rem; border-radius: var(--radius); background-color: var(--red-soft); color: var(--red-dark); }
-@media (max-width: 768px) { .facts { grid-template-columns: 1fr; } .card { overflow-x: auto; } .totals { min-width: 0; align-self: stretch; } .actions { flex-direction: column; } }
+@media (max-width: 768px) { .facts { grid-template-columns: 1fr 1fr; } .card { overflow-x: auto; } .totals { min-width: 0; align-self: stretch; } .actions { flex-direction: column; } }

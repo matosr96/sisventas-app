@@ -4,12 +4,13 @@
   </app-header-page>
   @if (list.isLoading()) { <app-skeleton /> }
   @else if (list.isError()) { <p class="error">No se pudieron cargar los usuarios. Reintenta en unos segundos.</p> }
-  @else if (list.items().length === 0) {
+  @else if (list.count() === 0 && !list.hasFilters()) {
     <app-empty title="Usuarios" copy="Crea el primer usuario del equipo." buttonName="Crear usuario" (create)="creating.set(true)" />
-  } @else if (rows().length === 0) {
+  } @else if (list.count() === 0) {
     <app-empty variant="no-results" (clear)="list.clearFilters()" />
   } @else {
-    <app-table [data]="rows()" [headers]="['Usuario', 'Nombre', 'Rol', 'Estado']" [keys]="['username', 'fullName', 'roleCell', 'statusCell']" [screenName]="screen" (edit)="edit($event)" />
+    <app-table [data]="rows()" [headers]="['Usuario', 'Nombre', 'Rol', 'Estado']" [keys]="['username', 'name', 'roleCell', 'statusCell']" [screenName]="screen"
+      [total]="list.count()" [query]="list.tableQuery()" [sortableKeys]="['username', 'name']" (queryChange)="list.onQuery($event)" (edit)="edit($event)" />
   }
 </app-layout>
 <app-create-user [open]="creating()" (closed)="creating.set(false)" />

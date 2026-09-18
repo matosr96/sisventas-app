@@ -24,11 +24,11 @@ export class Users {
   ];
   readonly statusFilter = computed(() => this.list.filters()["status"] ?? null);
   readonly rows = computed<Row[]>(() =>
-    this.list.filtered().map((user) => {
+    this.list.items().map((user) => {
       const isAdmin = user.roles.includes(RoleName.ADMIN);
       return {
         ...user,
-        fullName: `${user.firstName} ${user.lastName}`,
+        name: `${user.firstName} ${user.lastName}`,
         roleCell: badge(roleLabel(isAdmin ? RoleName.ADMIN : RoleName.USER), isAdmin ? "info" : "neutral"),
         statusCell: badge(userStatusLabel(user.status), user.status === UserStatus.ACTIVE ? "ok" : "neutral"),
       };

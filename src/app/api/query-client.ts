@@ -25,4 +25,9 @@ export class QueryClient {
       this.byKey.get(key)?.forEach((resource) => resource.reload());
     }
   }
+
+  /** Todo lo que esté en pantalla: al volver a la pestaña, otro vendedor pudo mover el stock. */
+  invalidateAll(): void {
+    this.byKey.forEach((set) => set.forEach((resource) => resource.reload()));
+  }
 }

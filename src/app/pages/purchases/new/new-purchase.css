@@ -55,3 +55,5 @@
   .cart { position: static; max-height: none; }
   .grid { grid-template-columns: repeat(2, 1fr); }
 }
+
+.searching { border-color: var(--blue-soft); }

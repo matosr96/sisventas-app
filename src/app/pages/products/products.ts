@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from "@angular/core";
+import { Component, computed, inject, input, signal, type OnInit } from "@angular/core";
 import { Router } from "@angular/router";
 import { Empty, Table, badge, type Row } from "../../components/container";
 import { Layout } from "../../components/layout/layout";
@@ -19,12 +19,14 @@ import { UpdateProduct } from "./update/update-product";
   templateUrl: "./products.html",
   styleUrl: "./products.css",
 })
-export class Products {
+export class Products implements OnInit {
+  /** ?lowStock=true desde Inicio: llega por withComponentInputBinding. */
+  readonly lowStock = input<string>();
   private readonly router = inject(Router);
   readonly auth = inject(AuthStore);
   readonly screen = ScreenName.PRODUCT;
-  readonly list = listProducts((product, term) => [product.sku, product.name].join(" ").toLowerCase().includes(term));
-  private readonly categories = listCategories(() => true);
+  readonly list = listProducts();
+  private readonly categories = listCategories({ limit: 100 });
   readonly remover = deleteItem();
   readonly creating = signal(false);
   readonly editing = signal<Product | null>(null);
@@ -32,19 +34,19 @@ export class Products {
   readonly statusOptions: FilterOption[] = [
     { value: ProductStatus.ACTIVE, label: "Activos" }, { value: ProductStatus.INACTIVE, label: "Retirados" },
   ];
+  readonly stockOptions: FilterOption[] = [{ value: "true", label: "Solo stock bajo" }];
   readonly categoryOptions = computed<FilterOption[]>(() =>
     this.categories.items().map((category) => ({ value: String(category.id), label: category.name }))
   );
-  readonly statusFilter = computed(() => this.list.filters()["status"] ?? null);
-  readonly categoryFilter = computed(() => this.list.filters()["categoryId"] ?? null);
+  readonly filter = (key: string) => this.list.filters()[key] ?? null;
 
   /** Los valores derivados (etiquetas, dinero, badges) se calculan aquí, no dentro de la tabla. */
   readonly rows = computed<Row[]>(() =>
-    this.list.filtered().map((product) => ({
+    this.list.items().map((product) => ({
       ...product,
-      priceLabel: formatMoney(product.salePrice),
-      statusCell: badge(productStatusLabel(product.status), product.status === ProductStatus.ACTIVE ? "ok" : "neutral"),
-      stockCell: product.currentStock <= 0
+      price: formatMoney(product.salePrice),
+      status: badge(productStatusLabel(product.status), product.status === ProductStatus.ACTIVE ? "ok" : "neutral"),
+      stock: product.currentStock <= 0
         ? badge("Agotado", "danger")
         : product.lowStock != null && product.currentStock <= product.lowStock
           ? badge(`${product.currentStock} · bajo`, "warn")
@@ -52,7 +54,9 @@ export class Products {
     }))
   );
 
+  ngOnInit(): void { if (this.lowStock() === "true") this.list.setFilters({ lowStock: "true", status: ProductStatus.ACTIVE }); }
+
   open(row: Row): void { void this.router.navigate([PrivateRoutes.PRODUCTS, row["id"]]); }
   edit(row: Row): void { this.editing.set(this.list.items().find((product) => product.id === row["id"]) ?? null); }
-  remove(row: Row): void { this.remover.remove(this.screen, Number(row["id"])); }
+  remove(row: Row): void { void this.remover.remove(this.screen, Number(row["id"])); }
 }

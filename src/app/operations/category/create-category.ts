@@ -18,6 +18,7 @@ export function createCategory() {
   /** Devuelve true si se creó, para que la pantalla cierre el modal. */
   const submit = async (event: Event): Promise<boolean> => {
     event.preventDefault();
+    if (pending()) return false; // Enter repetido mientras se guarda: una sola petición
     pending.set(true);
     try {
       await api.create({ ...form });

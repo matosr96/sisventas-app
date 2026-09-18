@@ -17,6 +17,7 @@ export function signin() {
 
   const submit = async (event: Event): Promise<void> => {
     event.preventDefault();
+    if (pending()) return; // Enter repetido mientras se guarda: una sola petición
     pending.set(true);
     try {
       auth.setSession(await api.signin(form));

@@ -7,6 +7,7 @@
   </div>
   <nav class="nav">
     @for (item of items(); track item.url) {
+      @if (item.section) { <span class="section">{{ item.section }}</span> }
       <a class="link" [routerLink]="item.url" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: item.url === '/' }" (click)="ui.closeSidebar()" [title]="item.name">
         <i class="bx" [class]="'bx ' + item.icon"></i>
         <span class="link_name">{{ item.name }}</span>

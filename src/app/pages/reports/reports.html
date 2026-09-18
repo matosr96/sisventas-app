@@ -1,0 +1,60 @@
+<app-layout>
+  <app-header-page title="Reportes" icon="bx-bar-chart-alt-2" [items]="['Inicio', 'Reportes']" [searchable]="false">
+    <a actions class="link" [routerLink]="routes.CLOSING"><i class="bx bx-wallet"></i>Cierre de caja</a>
+    <app-date-range filters [(value)]="op.range" />
+  </app-header-page>
+  @if (op.isLoading()) {
+    <app-skeleton variant="cards" />
+  } @else if (op.isError()) {
+    <p class="error">No se pudo cargar el informe. Reintenta en unos segundos.</p>
+  } @else {
+    @let report = op.report();
+    <p class="period">Periodo: <strong>{{ periodLabel() }}</strong></p>
+    <section class="metrics">
+      <app-metric-card label="Ventas" [value]="report.count" icon="bx-receipt" />
+      <app-metric-card label="Vendido" [value]="formatMoney(report.total)" icon="bx-dollar-circle" tone="ok" />
+      <app-metric-card label="Ticket promedio" [value]="formatMoney(op.averageTicket())" icon="bx-calculator" />
+      <app-metric-card label="Margen estimado" [value]="formatMoney(report.estimatedMargin)" icon="bx-trending-up" [tone]="report.estimatedMargin >= 0 ? 'ok' : 'warn'" [hint]="marginPercent() === null ? 'con el último costo conocido' : marginPercent() + ' % sobre lo vendido, con el último costo conocido'" />
+    </section>
+    <section class="panel">
+      <h2 class="panel_title"><i class="bx bx-line-chart"></i>Ventas por día</h2>
+      <app-bar-chart [points]="byDay()" [format]="formatMoney" />
+    </section>
+    <section class="panels">
+      <article class="panel">
+        <h2 class="panel_title"><i class="bx bx-group"></i>Por vendedor</h2>
+        @if (report.byUser.length === 0) { <p class="muted">Sin ventas en el periodo.</p> }
+        @else {
+          <ul class="bars">
+            @for (user of report.byUser; track user.userId) {
+              <li class="bar_row">
+                <span class="bar_label">{{ user.userName }}<span class="muted"> · {{ user.count }} ventas</span></span>
+                <span class="bar_track"><span class="bar_fill" [style.width.%]="(user.total / maxUserTotal()) * 100"></span></span>
+                <span class="bar_value">{{ formatMoney(user.total) }}</span>
+              </li>
+            }
+          </ul>
+        }
+      </article>
+      <article class="panel">
+        <h2 class="panel_title"><i class="bx bx-trophy"></i>Productos más vendidos</h2>
+        @if (report.topProducts.length === 0) { <p class="muted">Sin ventas en el periodo.</p> }
+        @else {
+          <table class="table">
+            <thead><tr><th>Producto</th><th class="num">Unid.</th><th class="num">Vendido</th><th class="num">Margen</th></tr></thead>
+            <tbody>
+              @for (product of report.topProducts; track product.productId) {
+                <tr>
+                  <td><a class="row_link" [routerLink]="[routes.PRODUCTS, product.productId]">{{ product.name }}</a><span class="muted block">{{ product.sku }}</span></td>
+                  <td class="num">{{ product.quantity }}</td>
+                  <td class="num">{{ formatMoney(product.total) }}</td>
+                  <td class="num" [class.negative]="product.margin < 0">{{ formatMoney(product.margin) }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+      </article>
+    </section>
+  }
+</app-layout>

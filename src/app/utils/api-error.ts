@@ -1,6 +1,10 @@
 import { HttpErrorResponse } from "@angular/common/http";
 import { DEFAULT_ERROR_MESSAGE, ErrorMessages } from "../constants";
 
+/** Código de dominio de la respuesta, o null si no es un error de la API. */
+export const apiErrorCode = (error: unknown): string | null =>
+  error instanceof HttpErrorResponse ? (error.error as { message?: string } | null)?.message ?? null : null;
+
 /** Traduce el { message: "<código>" } de la API a un texto en español para el toast. */
 export const apiErrorMessage = (error: unknown): string => {
   if (error instanceof HttpErrorResponse) {

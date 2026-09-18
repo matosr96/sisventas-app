@@ -12,51 +12,78 @@ its loading, error, empty and data states.
 
 ## What it does
 
-- **Sign in** with the API's JWT; roles `USER` (seller) and `ADMIN` drive both the menu and the routes.
-- **Home**: today's sales and takings compared with yesterday, low-stock count, this month's purchases,
-  plus the low-stock list and the latest invoices.
-- **Products**: catalog with SKU, prices and stock as a sortable table with status badges and filter
-  chips (status, category); a detail page with the **stock ledger** and manual adjustments with a
-  mandatory reason. Stock is never edited by hand.
-- **Categories** and **suppliers**: plain CRUD; suppliers with purchases are deactivated, not deleted.
-- **Sales**: a **point-of-sale screen** — product tiles with stock badges, search by SKU or name
-  (Enter adds the product, barcode-scanner friendly), category chips and a sticky order panel with
-  quantity steppers and the estimated total. The server freezes prices and computes the total; the
-  detail shows the line items, the **invoice PDF** and voiding (admin).
-- **Purchases**: the same layout, with the supplier and the unit cost paid per line (prefilled with the
-  last known cost); voiding returns the units.
-- **Users** (admin): create, assign role, activate or deactivate. **Profile**: change own password.
-- Light and dark themes, following the system by default.
+- **Sign in** with the API's JWT; roles `USER` (seller) and `ADMIN` drive the menu, the routes and a
+  "no permission" page. The session refreshes the user on start, warns five minutes before the token
+  expires, signs out when it does, and can be closed on every device from the profile.
+- **Home**: today's sales and takings compared with yesterday, low-stock count, this month's
+  purchases and inventory value, all aggregated by the API, plus the low-stock and latest-sales lists.
+- **Point of sale**: product tiles with images and stock badges, search by SKU or name resolved by
+  the API (barcode-scanner friendly: Enter adds the product), category chips, a sticky order panel
+  with quantity steppers, and a **checkout step** with payment method, discount, customer name,
+  cash received with quick amounts and the change. Lines rejected for stock are marked, not lost.
+- **Sales**: server-side list with date range, payment method and text filters; detail with the
+  totals breakdown (subtotal, discount, tax, total, received, change), **partial returns** to stock,
+  date correction, A4 invoice PDF and an **80 mm receipt** sent straight to the printer.
+- **Purchases**: same layout with the supplier and the unit cost paid per line; date correction;
+  voiding returns the units.
+- **Products**, **categories**, **suppliers**: server-side lists with sortable columns, filter chips
+  (status, category, low stock) and drawers for the long forms; the product page shows its stock
+  ledger and takes manual adjustments with a mandatory reason. Stock is never edited by hand.
+- **Inventory**: the global stock ledger filtered by movement type and dates.
+- **Reports**: sales report over a date range (totals, average ticket, estimated margin, daily
+  chart, by seller, top products) and a **cash closing** per day and seller by payment method.
+- **Users** (admin): create with an initial role, edit names and photo, change role or status,
+  reset a forgotten password. **Audit** (admin): every write the API recorded.
+- **Profile**: edit own names and photo, change password, log out everywhere.
+- Light and dark themes, following the system by default; installable (web manifest).
 
 ### Interface conventions
 
 The panel follows the patterns that current admin and POS products share (Shopify admin and POS,
 Square, Carbon and Atlassian design guidelines), without any UI library:
 
-- Tables: sticky header, click-to-sort columns, right-aligned tabular figures, status **badges**,
-  always-visible row actions, page size selector and a result range.
+- Tables: sticky header, click-to-sort columns (only the ones the API can sort), right-aligned
+  tabular figures, status **badges**, always-visible row actions, page size selector and a result
+  range. Paging, sorting, search (debounced) and filters all happen **on the server**.
 - Every list has four states — **skeleton** while loading, an error notice, an empty state with a
   call to action, and a distinct **"no results"** state that clears the search and filters.
-- Short forms open in a centered modal; long ones (product, user) in a **side drawer** that keeps the
-  list visible.
+- Short forms open in a centered modal; long ones (product, user, returns) in a **side drawer**
+  that keeps the list visible. Destructive actions ask through a **modal confirm dialog** with a
+  promise (`await confirm.ask(...)`), never a toast that can expire.
 - Document pages put the status badge next to the number and the actions in the header, with the
   totals block aligned to the right.
 - Design tokens in `src/styles.css`: a 14px base, small radius for controls and a larger one for
   surfaces, semantic accents (blue action, green ok, amber warning, red danger) defined for both themes.
+- Page titles per route, a "no permission" page, 401/403 explained once by the interceptor,
+  double-submit guards on every form, and a reload of what is on screen when the tab regains focus.
 
 ## Quick start
 
-Requires Node 24 and pnpm 10, and the API running at `http://localhost:8080/api/v1`
-(see the API's README: `docker compose up -d db`, migrate, `./mvnw spring-boot:run`).
+Requires Node 24, pnpm 10 and the API running locally (see its README; add
+`http://localhost:4200` to its `CORS_ORIGINS`).
 
 ```bash
 pnpm install
 pnpm start          # http://localhost:4200
+pnpm test           # unit tests (vitest)
+pnpm lint
+pnpm build          # dist/sisventas-app/browser
 ```
 
-The API base URL lives in `src/app/api/api-config.ts` and is changed by commenting lines: there are
-no environment variables. Sign in with any user created through the API's `/auth/signup`; grant
-`ADMIN` in the `users_roles` table to see purchases, suppliers and users.
+The API URL is read at startup from `public/config.json` (`{ "apiUrl": "http://localhost:8080/api/v1" }`),
+so the same build serves any environment. Sign in with a user created through the API; an `ADMIN`
+sees purchases, suppliers, users and the audit.
+
+### Running with Docker
+
+```bash
+docker build -t sisventas-app .
+docker run --rm -p 4300:80 -e API_URL=http://localhost:8080/api/v1 sisventas-app
+```
+
+Or `docker compose up`. The image (nginx with SPA fallback and cache headers) writes `config.json`
+from `API_URL` when the container starts. Every green build on `main` publishes
+`ghcr.io/matosr96/sisventas-app` (`latest`, `sha-<commit>`, and the version on `v*` tags).
 
 ## Stack
 
@@ -103,9 +130,10 @@ Errors arrive as `{ "message": "<code>" }` and are translated to Spanish in one 
 
 ## Still out of scope
 
-- **Deployment**: it runs locally against the local API.
-- **Reports and charts** beyond the home summary.
-- **Editing a sale or purchase date** after registration (the API allows it; the panel does not expose it yet).
+- **Hosting**: the image is published, nothing runs it.
+- **Offline mode**: the panel is installable but needs the API online.
+- **Customers as an entity, multi-store, multi-currency**: the API keeps one business and one
+  currency; the customer is a free-text name on the sale.
 
 ## License
 

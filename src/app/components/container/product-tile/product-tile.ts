@@ -17,6 +17,7 @@ import { Badge } from "../../shared/badge/badge";
         <span class="sku">{{ product().sku }}</span>
         @if (quantity() > 0) { <span class="count">{{ quantity() }}</span> }
       </span>
+      @if (product().image) { <img class="image" [src]="product().image" alt="" loading="lazy" /> }
       <span class="name">{{ product().name }}</span>
       <span class="bottom">
         <span class="price">{{ priceLabel() }}</span>
@@ -36,6 +37,7 @@ import { Badge } from "../../shared/badge/badge";
     .name { flex: 1; font-weight: 600; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
     .bottom { display: flex; align-items: center; justify-content: space-between; gap: 0.8rem; }
     .price { font-weight: 700; font-size: 1.5rem; }
+    .image { width: 100%; height: 7rem; object-fit: cover; border-radius: var(--radius-sm); background-color: var(--white-two); }
   `,
 })
 export class ProductTile {

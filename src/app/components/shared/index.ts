@@ -14,3 +14,6 @@ export { Logo } from "./logo/logo";
 export { ThemeToggle } from "./theme-toggle/theme-toggle";
 export { Toaster } from "./toaster/toaster";
 export { Toast } from "./toaster/toast";
+export { ConfirmDialog } from "./confirm-dialog/confirm-dialog";
+export { Confirm, type ConfirmOptions } from "./confirm-dialog/confirm";
+export { DateRangePicker, type DateRange } from "./date-range/date-range";

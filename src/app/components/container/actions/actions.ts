@@ -18,11 +18,13 @@ export class Actions {
   readonly edit = output<void>();
   readonly remove = output<void>();
 
+  /** Libro de stock y auditoría son inmutables: ninguna acción de fila. */
+  private readonly readOnly = computed(() => this.screenName() === ScreenName.MOVEMENT || this.screenName() === ScreenName.AUDIT);
   readonly canEdit = computed(() =>
-    this.screenName() !== ScreenName.SALE && this.screenName() !== ScreenName.PURCHASE && this.auth.isAdmin()
+    !this.readOnly() && this.screenName() !== ScreenName.SALE && this.screenName() !== ScreenName.PURCHASE && this.auth.isAdmin()
   );
   // Los usuarios no se borran: se desactivan desde su edición. Sin botón que no haga nada.
-  readonly canDelete = computed(() => this.screenName() !== ScreenName.USER && this.auth.isAdmin());
+  readonly canDelete = computed(() => !this.readOnly() && this.screenName() !== ScreenName.USER && this.auth.isAdmin());
   readonly removeLabel = computed(() =>
     this.screenName() === ScreenName.SALE || this.screenName() === ScreenName.PURCHASE ? "Anular" : "Eliminar"
   );

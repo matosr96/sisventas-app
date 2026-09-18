@@ -19,7 +19,7 @@ import { UpdateSupplier } from "./update/update-supplier";
 export class Suppliers {
   readonly auth = inject(AuthStore);
   readonly screen = ScreenName.SUPPLIER;
-  readonly list = listSuppliers((item, term) => [item.name, item.taxId, item.email, item.phone].join(" ").toLowerCase().includes(term));
+  readonly list = listSuppliers();
   readonly remover = deleteItem();
   readonly creating = signal(false);
   readonly editing = signal<Supplier | null>(null);
@@ -28,11 +28,11 @@ export class Suppliers {
   ];
   readonly statusFilter = computed(() => this.list.filters()["status"] ?? null);
   readonly rows = computed<Row[]>(() =>
-    this.list.filtered().map((item) => ({
+    this.list.items().map((item) => ({
       ...item, statusCell: badge(supplierStatusLabel(item.status), item.status === SupplierStatus.ACTIVE ? "ok" : "neutral"),
     }))
   );
 
   edit(row: Row): void { this.editing.set(this.list.items().find((item) => item.id === row["id"]) ?? null); }
-  remove(row: Row): void { this.remover.remove(this.screen, Number(row["id"])); }
+  remove(row: Row): void { void this.remover.remove(this.screen, Number(row["id"])); }
 }

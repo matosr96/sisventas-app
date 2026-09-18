@@ -11,7 +11,7 @@
       <section class="catalog">
         <div class="catalog_bar">
           <!-- Enter (teclado o lector de código de barras) añade el producto: keydown lo captura y el form cubre el envío implícito. -->
-          <form class="search" (submit)="onSearchEnter($event)">
+          <form class="search" [class.searching]="op.isSearching()" (submit)="onSearchEnter($event)">
             <i class="bx bx-barcode-reader"></i>
             <input class="search_input" type="search" placeholder="SKU o nombre; Enter añade el producto" [value]="op.searchTerm()" (input)="onSearch($event)" (keydown.enter)="onSearchEnter($event)" aria-label="Buscar producto" />
           </form>
@@ -28,7 +28,7 @@
         }
       </section>
 
-      <form class="cart" (submit)="op.submit($event)">
+      <section class="cart">
         <header class="cart_head">
           <h2 class="cart_title">Pedido</h2>
           @if (op.cart().length > 0) { <button type="button" class="cart_clear" (click)="op.clear()">Vaciar</button> }
@@ -38,10 +38,10 @@
         } @else {
           <ul class="lines">
             @for (line of op.cart(); track line.product.id) {
-              <li class="line">
+              <li class="line" [class.rejected]="line.rejected">
                 <div class="line_info">
                   <span class="line_name">{{ line.product.name }}</span>
-                  <span class="line_meta">{{ formatMoney(line.product.salePrice) }} c/u</span>
+                  <span class="line_meta">{{ formatMoney(line.product.salePrice) }} c/u @if (line.rejected) { · <strong>sin stock suficiente</strong> }</span>
                 </div>
                 <div class="stepper">
                   <button type="button" class="step" (click)="op.decrement(line.product.id)" aria-label="Una menos"><i class="bx bx-minus"></i></button>
@@ -57,12 +57,44 @@
         <footer class="cart_foot">
           <div class="summary">
             <span class="summary_row"><span>Artículos</span><span>{{ op.itemCount() }}</span></span>
+            <span class="summary_row"><span>Subtotal</span><span>{{ formatMoney(op.subtotal()) }}</span></span>
+            @if (op.taxRate() > 0) { <span class="summary_row"><span>Impuesto ({{ formatPercent(op.taxRate()) }})</span><span>{{ formatMoney(op.tax()) }}</span></span> }
             <span class="summary_row total"><span>Total estimado</span><span>{{ formatMoney(op.estimatedTotal()) }}</span></span>
           </div>
-          <p class="hint">El precio se congela al registrar y el total lo calcula el servidor.</p>
-          <app-button [name]="op.pending() ? 'Registrando…' : 'Cobrar ' + formatMoney(op.estimatedTotal())" size="lg" icon="bx-check" [disabled]="op.pending() || op.cart().length === 0" />
+          <app-button [name]="'Cobrar ' + formatMoney(op.estimatedTotal())" type="button" size="lg" icon="bx-check" [disabled]="op.cart().length === 0" (clicked)="op.openCheckout()" />
         </footer>
-      </form>
+      </section>
     </div>
   }
 </app-layout>
+
+<app-modal [open]="op.checkingOut()" title="Cobrar" [subtitle]="op.itemCount() + ' artículos · ' + formatMoney(op.subtotal()) + ' antes de descuento'" (closed)="op.closeCheckout()">
+  <form class="checkout" (submit)="op.submit($event)">
+    <div class="row">
+      <app-select name="paymentMethod" label="Método de pago" [options]="paymentOptions" [value]="op.checkout().paymentMethod" (valueChange)="op.setCheckout({ paymentMethod: $event ?? cash })" [required]="true" />
+      <app-number-input name="discount" label="Descuento (en dinero)" [value]="op.checkout().discount" (valueChange)="op.setCheckout({ discount: $event })" [min]="0" />
+    </div>
+    <app-input name="customerName" label="Cliente (opcional)" [value]="op.checkout().customerName" (valueChange)="op.setCheckout({ customerName: $event })" placeholder="Nombre para la factura" />
+    @if (op.checkout().paymentMethod === cash) {
+      <div class="cash">
+        <app-number-input name="amountPaid" label="Efectivo recibido" [value]="op.checkout().amountPaid" (valueChange)="op.setCheckout({ amountPaid: $event })" [min]="0" placeholder="Exacto si se deja vacío" />
+        <div class="quick">
+          @for (amount of quickAmounts(); track amount) {
+            <button type="button" class="quick_amount" (click)="op.setCheckout({ amountPaid: amount })">{{ formatMoney(amount) }}</button>
+          }
+        </div>
+      </div>
+    }
+    <div class="totals">
+      <span class="totals_row"><span>Subtotal</span><span>{{ formatMoney(op.subtotal()) }}</span></span>
+      @if (op.discount() > 0) { <span class="totals_row"><span>Descuento</span><span>-{{ formatMoney(op.discount()) }}</span></span> }
+      @if (op.taxRate() > 0) { <span class="totals_row"><span>Impuesto ({{ formatPercent(op.taxRate()) }})</span><span>{{ formatMoney(op.tax()) }}</span></span> }
+      <span class="totals_row grand"><span>Total</span><span>{{ formatMoney(op.estimatedTotal()) }}</span></span>
+      @if (op.checkout().paymentMethod === cash && op.checkout().amountPaid !== null) {
+        <span class="totals_row change" [class.short]="op.change() < 0"><span>{{ op.change() < 0 ? 'Falta' : 'Cambio' }}</span><span>{{ formatMoney(op.change() < 0 ? -op.change() : op.change()) }}</span></span>
+      }
+    </div>
+    <p class="hint">El servidor recalcula todo con el precio vigente y la tasa configurada; esto es una vista previa.</p>
+    <app-button [name]="op.pending() ? 'Registrando…' : 'Confirmar cobro'" size="lg" icon="bx-check-double" [disabled]="op.pending() || !op.canConfirm()" />
+  </form>
+</app-modal>
