@@ -17,3 +17,7 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    ignore:
+      # Solo LTS pares para Node; las impares no se despliegan.
+      - dependency-name: node
+        update-types: ["version-update:semver-major"]
