@@ -110,45 +110,71 @@ from `API_URL` when the container starts. Every green build on `main` publishes
 ## Stack
 
 Angular 22 (standalone components, signals, zoneless) · TypeScript · `HttpClient` · Router ·
-component styles with CSS custom properties. No UI, forms, charts, icons or state libraries: the
-dependency list is closed on purpose. Icons come from boxicons over a CDN.
+component styles with CSS custom properties · vitest for unit tests. No UI, forms, charts, icons or
+state libraries: the dependency list is closed on purpose. Icons come from boxicons over a CDN; the
+report chart is hand-written SVG.
 
-Gate: `pnpm lint && pnpm build`. There are no tests by design.
+Gate: `pnpm lint && pnpm test && pnpm build`. CI runs the same, plus `pnpm audit` and a Docker build,
+and publishes the image on `main`.
 
 ## Architecture
 
 ```
 src/app/
-├── api/            base URL, auth interceptor (token + 401), QueryClient (resource registry)
+├── api/            runtime API URL (config.json), auth interceptor (token, 401/403), QueryClient
 ├── services/       one @Injectable per API resource — the only place that touches HttpClient
-├── entities/       interfaces, DTOs and empty states
-├── store/          AuthStore and UiStore (persisted signals)
+├── entities/       interfaces, DTOs, empty states and the ListQuery → params mapping
+├── store/          AuthStore (session, token expiry), UiStore (theme, sidebar), SettingsStore (business)
 ├── operations/     one function per operation: the unit of business logic on the client
 ├── pages/          one folder per screen, with create/ update/ detail/ new/ subfolders
 ├── components/     layout, sidebar, shared kit (generic) and container kit (domain)
 ├── guards/         authGuard, roleGuard(...roles)
 ├── constants/      routes, screen names, resource keys, error messages
-└── utils/          formatting and error translation
+└── utils/          money/date formatting and error translation
+docker/             nginx.conf (SPA fallback, cache headers) and the entrypoint that writes config.json
+docs/screenshots/   the images above
 ```
 
 The dependency chain runs one way: **page → operation → (service | store) → HttpClient**. Pages never
 call the API; operations never know URLs; services never show toasts. Server state is an Angular
 `resource` registered in a small `QueryClient`, so a mutation invalidates every screen showing that
-resource by key — the key is the API resource name.
+resource by key — the key is the API resource name. Lists are `serverList` operations: page, page
+size, sort, debounced search and filter chips live in signals and travel as query params; the API
+does the work, the client never scans a collection.
 
 ## Contract with the API
 
 | Operation | Request | Response |
 | --- | --- | --- |
-| List | `GET /<resource>?limit=100` | `{ count, page, pages, items }` |
+| List | `GET /<resource>?page=&limit=&sort=&dir=&search=&<filters>` | `{ count, page, pages, items }` |
 | Read | `GET /<resource>/{id}` | entity |
 | Create | `POST /<resource>` | created entity |
 | Update | `PUT /<resource>/{id}` | updated entity |
 | Delete | `DELETE /<resource>/{id}` | 204 |
 | Sign in | `POST /auth/signin` `{ username, password }` | `{ accessToken, tokenType, user }` |
+| Settings | `GET /settings` | `{ businessName, currency, taxRate }` |
+| Reports | `GET /reports/summary`, `/reports/sales?from&to`, `/reports/closing?date&userId` | aggregates |
+| Returns | `POST /sales/{id}/returns` `{ reason, items: [{ saleItemId, quantity }] }` | the return |
+| PDF | `GET /sales/{id}/pdf?format=invoice\|receipt` | `application/pdf` |
+| Sessions | `POST /users/me/logout-all`, `PUT /users/{id}/password` | 204 |
 
 Errors arrive as `{ "message": "<code>" }` and are translated to Spanish in one place
-(`constants/error-messages.ts`). The stock ledger is the one list paginated server-side.
+(`constants/error-messages.ts`); the checkout reacts to `621` (insufficient stock) by marking the
+line. Money is formatted in the currency the API declares in `/settings`.
+
+## Tests
+
+```bash
+pnpm test                 # vitest, once
+pnpm test -- --watch      # while developing
+```
+
+Fourteen unit tests over the pieces that hold logic: query-to-params mapping, money and date
+formatting, API error translation and codes, JWT expiry reading, the table in client and server
+mode (sorting, paging, emitted queries, non-sortable keys), the server list (debounce, filters,
+clearing) and the POS cart and checkout arithmetic (stock caps, discount, tax, total, change).
+Screens are verified against the real API in the browser before a release; there are no end-to-end
+tests.
 
 ## Still out of scope
 
