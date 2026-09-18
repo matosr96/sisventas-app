@@ -2,7 +2,9 @@
 
 El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/).
 
-## [No publicado]
+## [1.0.0] - 2026-09-18
+
+Primera versión publicada: el panel completo contra `sisventas-api` 0.0.1.
 
 ### Añadido (sistema completo)
 - Listados paginados, ordenados, buscados y filtrados **en el servidor** (`serverList`): ya no

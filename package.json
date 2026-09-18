@@ -1,6 +1,21 @@
 {
   "name": "sisventas-app",
-  "version": "0.0.0",
+  "version": "1.0.0",
+  "description": "Point-of-sale panel for the SisVentas API: catalog, checkout, returns, inventory, reports and users.",
+  "license": "MIT",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/matosr96/sisventas-app.git"
+  },
+  "homepage": "https://github.com/matosr96/sisventas-app#readme",
+  "bugs": {
+    "url": "https://github.com/matosr96/sisventas-app/issues"
+  },
+  "engines": {
+    "node": ">=24",
+    "pnpm": ">=10"
+  },
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
@@ -9,7 +24,6 @@
     "test": "ng test",
     "lint": "ng lint"
   },
-  "private": true,
   "packageManager": "pnpm@10.34.5",
   "dependencies": {
     "@angular/common": "^22.1.0",

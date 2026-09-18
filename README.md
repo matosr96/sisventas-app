@@ -166,7 +166,7 @@ line. Money is formatted in the currency the API declares in `/settings`.
 
 ```bash
 pnpm test                 # vitest, once
-pnpm test -- --watch      # while developing
+pnpm test --watch         # while developing
 ```
 
 Fourteen unit tests over the pieces that hold logic: query-to-params mapping, money and date
