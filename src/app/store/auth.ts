@@ -5,11 +5,14 @@ const STORAGE_KEY = "auth";
 
 interface PersistedAuth { token: string; user: User | null; }
 
+const EMPTY: PersistedAuth = { token: "", user: null };
+
 const read = (): PersistedAuth => {
   try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY) || "") as PersistedAuth;
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? { ...EMPTY, ...(JSON.parse(raw) as Partial<PersistedAuth>) } : EMPTY;
   } catch {
-    return { token: "", user: null };
+    return EMPTY; // almacenamiento bloqueado o JSON corrupto: sesión vacía
   }
 };
 
@@ -23,7 +26,14 @@ export const tokenExpiresAt = (token: string): number | null => {
   }
 };
 
-/** Sesión del usuario. Único estado global de cliente junto con UiStore y SettingsStore; siempre se consume por señal. */
+/**
+ * Sesión del usuario. Único estado global de cliente junto con UiStore y SettingsStore; siempre se consume por señal.
+ *
+ * El token se guarda en localStorage a sabiendas: es un SPA sin backend intermedio (BFF), así que
+ * una cookie httpOnly obligaría a la API a emitir sesión por cookie con CSRF y CORS con credenciales.
+ * La defensa contra XSS está en no inyectar HTML (Angular sanitiza), en la CSP que sirve nginx y en
+ * que el token caduca y puede invalidarse en todos los dispositivos. Ver "Security notes" en el README.
+ */
 @Injectable({ providedIn: "root" })
 export class AuthStore {
   private readonly initial = read();

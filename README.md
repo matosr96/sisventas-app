@@ -169,12 +169,31 @@ pnpm test                 # vitest, once
 pnpm test --watch         # while developing
 ```
 
-Fourteen unit tests over the pieces that hold logic: query-to-params mapping, money and date
-formatting, API error translation and codes, JWT expiry reading, the table in client and server
-mode (sorting, paging, emitted queries, non-sortable keys), the server list (debounce, filters,
-clearing) and the POS cart and checkout arithmetic (stock caps, discount, tax, total, change).
+Thirty unit tests over the pieces that hold logic: query-to-params mapping, money and date
+formatting, API error translation and codes, JWT expiry reading, the auth and role guards, the
+interceptor (token header, 401 sign-out with notice, 403 notice, `/auth` exempt), the query client,
+the confirm dialog service, the table in client and server mode, the server list (debounce,
+filters, clearing), the catalog picker (server search, exact SKU match), the POS cart and checkout
+arithmetic, the purchase order (cost prefill, validations), partial returns (per-line caps, reason),
+the home delta, the session lifecycle (user refresh, expiry warning and sign-out) and the rendering
+of badges, chips, date range presets, metric cards and the SVG chart.
 Screens are verified against the real API in the browser before a release; there are no end-to-end
 tests.
+
+## Security notes
+
+- **The JWT is kept in `localStorage`** (`store/auth.ts`), which means any script that manages to
+  run in the page can read it. That is a deliberate trade-off: this is a SPA with no backend for
+  frontend, so an `httpOnly` cookie would require the API to issue cookie sessions with CSRF
+  protection and credentialed CORS. What stands between an injected script and the token is
+  (1) Angular's sanitizer — the panel never binds HTML, (2) the Content-Security-Policy nginx
+  sends (`script-src 'self'`, no inline scripts, `connect-src` limited to HTTPS and localhost),
+  (3) short-lived tokens the user can invalidate on every device (`POST /users/me/logout-all`,
+  admin password reset). If a BFF ever appears, the interceptor and `AuthStore` are the only two
+  files that know where the token lives.
+- The panel decodes the JWT only to read `exp` for the expiry warning; it never trusts the claims
+  for authorization — roles come from `GET /users/me` and the API enforces every rule anyway.
+- `config.json` is public by design (it holds nothing but the API URL).
 
 ## Still out of scope
 

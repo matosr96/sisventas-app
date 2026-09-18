@@ -29,6 +29,10 @@ Primera versión publicada: el panel completo contra `sisventas-api` 0.0.1.
 - Tests unitarios con vitest (consulta, formato, errores de API, JWT, tabla, listas en servidor,
   carrito y cobro) y `pnpm test` + `pnpm audit` en CI.
 
+### Seguridad
+- Content-Security-Policy en nginx (`script-src 'self'`, sin scripts inline, `connect-src` acotado)
+  como barrera contra XSS; el tradeoff del token en `localStorage` queda explicado en el README.
+
 ### Cambiado
 - Inicio consume `GET /reports/summary` en vez de sumar listas en el cliente.
 - La moneda con la que se pinta el dinero viene de `GET /settings`.
