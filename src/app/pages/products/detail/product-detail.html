@@ -1,8 +1,9 @@
 <app-layout>
   @if (detail.isLoading()) {
-    <app-loader />
+    <app-skeleton variant="detail" [count]="5" />
   } @else if (detail.product(); as product) {
     <app-header-page [title]="product.name" icon="bx-package" [items]="['Inicio', 'Productos', product.sku]" [searchable]="false"
+      [badge]="productStatusLabel(product.status)" [badgeTone]="product.status === 'ACTIVE' ? 'ok' : 'neutral'"
       [nameButton]="auth.isAdmin() ? 'Ajustar stock' : ''" (create)="adjusting.set(true)" />
     <a class="back" [routerLink]="routes.PRODUCTS"><i class="bx bx-arrow-back"></i>Volver a productos</a>
     <section class="facts">
@@ -10,24 +11,24 @@
       <div class="fact"><span class="fact_label">Precio de venta</span><span class="fact_value">{{ formatMoney(product.salePrice) }}</span></div>
       <div class="fact"><span class="fact_label">Último costo</span><span class="fact_value">{{ formatMoney(product.purchasePrice) || '—' }}</span></div>
       <div class="fact"><span class="fact_label">Stock actual</span><span class="fact_value" [class.low]="product.lowStock !== null && product.currentStock <= product.lowStock">{{ product.currentStock }}</span></div>
-      <div class="fact"><span class="fact_label">Estado</span><span class="fact_value">{{ productStatusLabel(product.status) }}</span></div>
+      <div class="fact"><span class="fact_label">Stock mínimo</span><span class="fact_value">{{ product.lowStock ?? '—' }}</span></div>
     </section>
     <section class="ledger">
       <h2 class="ledger_title"><i class="bx bx-book"></i>Libro de stock</h2>
       @if (movements.isLoading()) {
-        <app-loader />
+        <app-skeleton [rows]="4" />
       } @else if (movements.items().length === 0) {
         <p class="muted">Sin movimientos todavía.</p>
       } @else {
         <table class="table">
-          <thead><tr><th>Fecha</th><th>Movimiento</th><th>Cantidad</th><th>Saldo</th><th>Referencia</th></tr></thead>
+          <thead><tr><th>Fecha</th><th>Movimiento</th><th class="num">Cantidad</th><th class="num">Saldo</th><th>Referencia</th></tr></thead>
           <tbody>
             @for (movement of movements.items(); track movement.id) {
               <tr>
                 <td>{{ formatDateTime(movement.createdAt) }}</td>
                 <td>{{ movementTypeLabel(movement.type) }}</td>
-                <td [class.in]="movement.quantity > 0" [class.out]="movement.quantity < 0">{{ movement.quantity > 0 ? '+' : '' }}{{ movement.quantity }}</td>
-                <td>{{ movement.stockAfter }}</td>
+                <td class="num" [class.in]="movement.quantity > 0" [class.out]="movement.quantity < 0">{{ movement.quantity > 0 ? '+' : '' }}{{ movement.quantity }}</td>
+                <td class="num">{{ movement.stockAfter }}</td>
                 <td class="muted">{{ movement.reference || movement.reason || '' }}</td>
               </tr>
             }

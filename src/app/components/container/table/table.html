@@ -1,27 +1,47 @@
 <div class="wrapper">
-  <table class="table">
-    <thead>
-      <tr>
-        @for (header of headers(); track header) { <th>{{ header }}</th> }
-        <th class="actions_col">Acciones</th>
-      </tr>
-    </thead>
-    <tbody>
-      @for (row of rows(); track row['id']) {
-        <tr class="row" (click)="rowClick.emit(row)">
-          @for (key of keys(); track key) { <td>{{ render(row[key]) }}</td> }
-          <td class="actions_col">
-            <app-actions [screenName]="screenName()" (edit)="edit.emit(row)" (remove)="remove.emit(row)" />
-          </td>
+  <div class="scroll">
+    <table class="table">
+      <thead>
+        <tr>
+          @for (header of headers(); track header; let i = $index) {
+            <th [class.num]="isNumeric(keys()[i])" [attr.aria-sort]="sortKey() === keys()[i] ? (sortDirection() === 'asc' ? 'ascending' : 'descending') : null">
+              <button type="button" class="sort" [class.active]="sortKey() === keys()[i]" (click)="sortBy(keys()[i])">
+                {{ header }}
+                <i class="bx" [class]="'bx ' + (sortKey() === keys()[i] ? (sortDirection() === 'asc' ? 'bx-up-arrow-alt' : 'bx-down-arrow-alt') : 'bx-sort-alt-2')"></i>
+              </button>
+            </th>
+          }
+          <th class="actions_col">Acciones</th>
         </tr>
-      }
-    </tbody>
-  </table>
-  @if (pages() > 1) {
-    <footer class="pagination">
-      <button type="button" class="page_button" (click)="previous()" [disabled]="currentPage() === 1"><i class="bx bx-chevron-left"></i></button>
-      <span class="page_label">Página {{ currentPage() }} de {{ pages() }}</span>
-      <button type="button" class="page_button" (click)="next()" [disabled]="currentPage() === pages()"><i class="bx bx-chevron-right"></i></button>
-    </footer>
-  }
+      </thead>
+      <tbody>
+        @for (row of rows(); track row['id']) {
+          <tr class="row" (click)="rowClick.emit(row)">
+            @for (key of keys(); track key) {
+              <td [class.num]="isNumeric(key)">
+                @if (isBadge(row[key])) { <app-badge [label]="$any(row[key]).badge" [tone]="$any(row[key]).tone" /> }
+                @else { {{ render(row[key]) }} }
+              </td>
+            }
+            <td class="actions_col">
+              <app-actions [screenName]="screenName()" (edit)="edit.emit(row)" (remove)="remove.emit(row)" />
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+  <footer class="footer">
+    <span class="range">{{ rangeLabel() }}</span>
+    <div class="pagination">
+      <label class="size">Por página
+        <select class="size_select" [value]="pageSize()" (change)="setPageSize($event)">
+          @for (size of pageSizes; track size) { <option [value]="size">{{ size }}</option> }
+        </select>
+      </label>
+      <button type="button" class="page_button" (click)="previous()" [disabled]="currentPage() === 1" aria-label="Página anterior"><i class="bx bx-chevron-left"></i></button>
+      <span class="page_label">{{ currentPage() }} / {{ pages() }}</span>
+      <button type="button" class="page_button" (click)="next()" [disabled]="currentPage() === pages()" aria-label="Página siguiente"><i class="bx bx-chevron-right"></i></button>
+    </div>
+  </footer>
 </div>

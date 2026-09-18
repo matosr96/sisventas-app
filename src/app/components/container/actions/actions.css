@@ -1,5 +1,5 @@
 .actions { display: flex; gap: 0.4rem; justify-content: flex-end; }
-.action { display: flex; padding: 0.6rem; border-radius: 0.8rem; color: var(--text-muted); transition: background-color .2s ease, color .2s ease; }
+.action { display: flex; padding: 0.6rem; border-radius: var(--radius-sm); color: var(--text-muted); transition: background-color .2s ease, color .2s ease; }
 .action:hover { background-color: var(--blue-soft); color: var(--blue-dark); }
 .action i { font-size: 1.8rem; }
 .danger:hover { background-color: var(--red-soft); color: var(--red-dark); }

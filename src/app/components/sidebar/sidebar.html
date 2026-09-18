@@ -1,7 +1,9 @@
 <aside class="sidebar" [class.collapsed]="ui.sidebarCollapsed()" [class.open]="ui.sidebarOpen()">
   <div class="brand">
     <app-logo [variant]="ui.sidebarCollapsed() ? 'mark' : 'logotipo'" />
-    <button type="button" class="collapse" (click)="ui.toggleSidebar()" aria-label="Contraer menú"><i class="bx bx-chevron-left"></i></button>
+    <button type="button" class="collapse" (click)="ui.toggleSidebar()" [attr.aria-label]="ui.sidebarCollapsed() ? 'Expandir menú' : 'Contraer menú'" [title]="ui.sidebarCollapsed() ? 'Expandir menú' : 'Contraer menú'">
+      <i class="bx" [class]="'bx ' + (ui.sidebarCollapsed() ? 'bx-chevron-right' : 'bx-chevron-left')"></i>
+    </button>
   </div>
   <nav class="nav">
     @for (item of items(); track item.url) {

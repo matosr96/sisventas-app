@@ -1,25 +1,75 @@
 <app-layout>
-  <app-header-page title="Registrar compra" icon="bx-cart-download" [items]="['Inicio', 'Compras', 'Nueva']" [searchable]="false" />
-  <a class="back" [routerLink]="routes.PURCHASES"><i class="bx bx-arrow-back"></i>Volver a compras</a>
+  <app-header-page title="Registrar compra" icon="bx-cart-download" [items]="['Inicio', 'Compras', 'Nueva']" [searchable]="false">
+    <a actions class="back" [routerLink]="routes.PURCHASES"><i class="bx bx-arrow-back"></i>Volver a compras</a>
+  </app-header-page>
   @if (op.isLoading()) {
-    <app-loader />
+    <app-skeleton variant="cards" [count]="8" />
+  } @else if (op.isError()) {
+    <p class="error">No se pudo cargar el catálogo. Reintenta en unos segundos.</p>
   } @else {
-    <form class="card" (submit)="op.submit($event)">
-      <app-select name="supplierId" label="Proveedor" [options]="supplierOptions()" [(value)]="op.supplierId" [required]="true" />
-      <h2 class="section">Líneas</h2>
-      @for (line of op.lines(); track $index; let i = $index) {
-        <div class="line">
-          <app-select name="product" label="Producto" [options]="productOptions()" [value]="line.productId" (valueChange)="op.setLine(i, { productId: $event })" [required]="true" />
-          <app-number-input name="quantity" label="Cantidad" [value]="line.quantity" (valueChange)="op.setLine(i, { quantity: $event })" [min]="1" step="1" [required]="true" />
-          <app-number-input name="unitCost" label="Costo unitario" [value]="line.unitCost" (valueChange)="op.setLine(i, { unitCost: $event })" [min]="0" [required]="true" />
-          <button type="button" class="remove" (click)="op.removeLine(i)" [disabled]="op.lines().length === 1" aria-label="Quitar línea"><i class="bx bx-x"></i></button>
+    <div class="pos">
+      <section class="catalog">
+        <div class="catalog_bar">
+          <!-- Enter (teclado o lector de código de barras) añade el producto: keydown lo captura y el form cubre el envío implícito. -->
+          <form class="search" (submit)="onSearchEnter($event)">
+            <i class="bx bx-barcode-reader"></i>
+            <input class="search_input" type="search" placeholder="SKU o nombre; Enter añade el producto" [value]="op.searchTerm()" (input)="onSearch($event)" (keydown.enter)="onSearchEnter($event)" aria-label="Buscar producto" />
+          </form>
+          @if (categoryOptions().length > 0) { <app-filter-chips [options]="categoryOptions()" [(value)]="op.categoryId" /> }
         </div>
-      }
-      <div class="toolbar">
-        <app-button name="Añadir línea" type="button" variant="ghost" icon="bx-plus" (clicked)="op.addLine()" />
-        <span class="total">Total: <strong>{{ formatMoney(op.total()) }}</strong></span>
-      </div>
-      <app-button [name]="op.pending() ? 'Registrando…' : 'Registrar compra'" [disabled]="op.pending()" />
-    </form>
+        @if (op.visible().length === 0) {
+          <p class="catalog_empty">Ningún producto coincide. Prueba con otro SKU o nombre.</p>
+        } @else {
+          <div class="grid">
+            @for (product of op.visible(); track product.id) {
+              <app-product-tile [product]="product" [quantity]="op.quantityOf(product.id)" price="cost" (pick)="op.add($event)" />
+            }
+          </div>
+        }
+      </section>
+
+      <form class="cart" (submit)="op.submit($event)">
+        <header class="cart_head">
+          <h2 class="cart_title">Orden de compra</h2>
+          @if (op.cart().length > 0) { <button type="button" class="cart_clear" (click)="op.clear()">Vaciar</button> }
+        </header>
+        <div class="supplier">
+          <app-select name="supplierId" label="Proveedor" [options]="supplierOptions()" [(value)]="op.supplierId" [required]="true" />
+        </div>
+        @if (op.cart().length === 0) {
+          <div class="cart_empty"><i class="bx bx-package"></i><p>Toca un producto del catálogo para añadirlo con su último costo.</p></div>
+        } @else {
+          <ul class="lines">
+            @for (line of op.cart(); track line.product.id) {
+              <li class="line">
+                <div class="line_top">
+                  <span class="line_name">{{ line.product.name }}</span>
+                  <button type="button" class="line_remove" (click)="op.remove(line.product.id)" aria-label="Quitar"><i class="bx bx-x"></i></button>
+                </div>
+                <div class="line_fields">
+                  <div class="stepper">
+                    <button type="button" class="step" (click)="op.decrement(line.product.id)" aria-label="Una menos"><i class="bx bx-minus"></i></button>
+                    <input class="qty" type="number" min="0" step="1" [value]="line.quantity" (change)="onQuantity(line.product.id, $event)" aria-label="Cantidad" />
+                    <button type="button" class="step" (click)="op.increment(line.product.id)" aria-label="Una más"><i class="bx bx-plus"></i></button>
+                  </div>
+                  <label class="cost"><span class="cost_label">Costo</span>
+                    <input class="cost_input" type="number" min="0" step="any" [value]="line.unitCost ?? ''" (input)="onCost(line.product.id, $event)" placeholder="0" required aria-label="Costo unitario" />
+                  </label>
+                  <span class="line_subtotal">{{ formatMoney(line.subtotal) }}</span>
+                </div>
+              </li>
+            }
+          </ul>
+        }
+        <footer class="cart_foot">
+          <div class="summary">
+            <span class="summary_row"><span>Unidades</span><span>{{ op.itemCount() }}</span></span>
+            <span class="summary_row total"><span>Total</span><span>{{ formatMoney(op.total()) }}</span></span>
+          </div>
+          <p class="hint">Cada línea congela su costo y actualiza el último costo del producto.</p>
+          <app-button [name]="op.pending() ? 'Registrando…' : 'Registrar compra'" size="lg" icon="bx-check" [disabled]="op.pending() || op.cart().length === 0" />
+        </footer>
+      </form>
+    </div>
   }
 </app-layout>

@@ -13,14 +13,36 @@ its loading, error, empty and data states.
 ## What it does
 
 - **Sign in** with the API's JWT; roles `USER` (seller) and `ADMIN` drive both the menu and the routes.
-- **Products**: catalog with SKU, prices and stock; a detail page with the **stock ledger** and manual
-  adjustments with a mandatory reason. Stock is never edited by hand.
+- **Home**: today's sales and takings compared with yesterday, low-stock count, this month's purchases,
+  plus the low-stock list and the latest invoices.
+- **Products**: catalog with SKU, prices and stock as a sortable table with status badges and filter
+  chips (status, category); a detail page with the **stock ledger** and manual adjustments with a
+  mandatory reason. Stock is never edited by hand.
 - **Categories** and **suppliers**: plain CRUD; suppliers with purchases are deactivated, not deleted.
-- **Purchases**: multi-line registration with the unit cost paid; voiding returns the units.
-- **Sales**: multi-line registration where the server freezes prices and computes the total; detail
-  with line items, **invoice PDF** and voiding (admin).
+- **Sales**: a **point-of-sale screen** — product tiles with stock badges, search by SKU or name
+  (Enter adds the product, barcode-scanner friendly), category chips and a sticky order panel with
+  quantity steppers and the estimated total. The server freezes prices and computes the total; the
+  detail shows the line items, the **invoice PDF** and voiding (admin).
+- **Purchases**: the same layout, with the supplier and the unit cost paid per line (prefilled with the
+  last known cost); voiding returns the units.
 - **Users** (admin): create, assign role, activate or deactivate. **Profile**: change own password.
 - Light and dark themes, following the system by default.
+
+### Interface conventions
+
+The panel follows the patterns that current admin and POS products share (Shopify admin and POS,
+Square, Carbon and Atlassian design guidelines), without any UI library:
+
+- Tables: sticky header, click-to-sort columns, right-aligned tabular figures, status **badges**,
+  always-visible row actions, page size selector and a result range.
+- Every list has four states — **skeleton** while loading, an error notice, an empty state with a
+  call to action, and a distinct **"no results"** state that clears the search and filters.
+- Short forms open in a centered modal; long ones (product, user) in a **side drawer** that keeps the
+  list visible.
+- Document pages put the status badge next to the number and the actions in the header, with the
+  totals block aligned to the right.
+- Design tokens in `src/styles.css`: a 14px base, small radius for controls and a larger one for
+  surfaces, semantic accents (blue action, green ok, amber warning, red danger) defined for both themes.
 
 ## Quick start
 

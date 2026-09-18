@@ -7,7 +7,7 @@ import { updateUser } from "../../../operations/user/update-user";
   selector: "app-update-user",
   imports: [Modal, SelectCpt, ButtonCnt],
   template: `
-    <app-modal [open]="true" [title]="'Editar ' + user().username" (closed)="closed.emit()">
+    <app-modal [open]="true" variant="drawer" [title]="'Editar ' + user().username" [subtitle]="user().firstName + ' ' + user().lastName" (closed)="closed.emit()">
       <form class="form" (submit)="save($event)">
         <app-select name="role" label="Rol" [options]="roleOptions" [(value)]="op.form.role" [required]="true" />
         <app-select name="status" label="Estado" [options]="statusOptions" [(value)]="op.form.status" [required]="true" />

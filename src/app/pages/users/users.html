@@ -1,11 +1,15 @@
 <app-layout>
-  <app-header-page title="Usuarios" icon="bx-group" [items]="['Inicio', 'Usuarios']" nameButton="Crear usuario" [(searchTerm)]="list.searchTerm" (create)="creating.set(true)" />
-  @if (list.isLoading()) { <app-loader /> }
+  <app-header-page title="Usuarios" icon="bx-group" [items]="['Inicio', 'Usuarios']" searchPlaceholder="Usuario o nombre…" nameButton="Crear usuario" [(searchTerm)]="list.searchTerm" (create)="creating.set(true)">
+    <app-filter-chips filters label="Estado" [options]="statusOptions" [value]="statusFilter()" (valueChange)="list.setFilter('status', $event)" />
+  </app-header-page>
+  @if (list.isLoading()) { <app-skeleton /> }
   @else if (list.isError()) { <p class="error">No se pudieron cargar los usuarios. Reintenta en unos segundos.</p> }
-  @else if (rows().length > 0) {
-    <app-table [data]="rows()" [headers]="['Usuario', 'Nombre', 'Rol', 'Estado']" [keys]="['username', 'fullName', 'roleLabel', 'statusLabel']" [screenName]="screen" (edit)="edit($event)" />
-  } @else {
+  @else if (list.items().length === 0) {
     <app-empty title="Usuarios" copy="Crea el primer usuario del equipo." buttonName="Crear usuario" (create)="creating.set(true)" />
+  } @else if (rows().length === 0) {
+    <app-empty variant="no-results" (clear)="list.clearFilters()" />
+  } @else {
+    <app-table [data]="rows()" [headers]="['Usuario', 'Nombre', 'Rol', 'Estado']" [keys]="['username', 'fullName', 'roleCell', 'statusCell']" [screenName]="screen" (edit)="edit($event)" />
   }
 </app-layout>
 <app-create-user [open]="creating()" (closed)="creating.set(false)" />

@@ -9,7 +9,7 @@
 .error { border-color: var(--red-bg); } .error i { color: var(--red-bg); }
 .warning { border-color: var(--amber-bg); } .warning i { color: var(--amber-bg); }
 .text { flex: 1; }
-.action, .cancel, .close { padding: 0.6rem 1rem; border-radius: 0.8rem; font-weight: 600; transition: background-color .2s ease; }
+.action, .cancel, .close { padding: 0.6rem 1rem; border-radius: var(--radius-sm); font-weight: 600; transition: background-color .2s ease; }
 .action { background-color: var(--red-bg); color: var(--on-accent); }
 .action:hover { background-color: var(--red-dark); }
 .cancel { background-color: var(--white-two); }

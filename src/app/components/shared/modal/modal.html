@@ -1,8 +1,11 @@
 @if (open()) {
-  <div class="overlay" role="presentation" tabindex="-1" (click)="onOverlay($event)" (keydown.escape)="closed.emit()">
-    <div class="modal" [class.modal_lg]="size() === 'lg'" role="dialog" aria-modal="true" [attr.aria-label]="title()">
+  <div class="overlay" [class.overlay_drawer]="variant() === 'drawer'" role="presentation" tabindex="-1" (click)="onOverlay($event)" (keydown.escape)="closed.emit()">
+    <div class="modal" [class.modal_lg]="size() === 'lg'" [class.drawer]="variant() === 'drawer'" role="dialog" aria-modal="true" [attr.aria-label]="title()">
       <header class="header">
-        <h2 class="title">{{ title() }}</h2>
+        <div class="titles">
+          <h2 class="title">{{ title() }}</h2>
+          @if (subtitle()) { <p class="subtitle">{{ subtitle() }}</p> }
+        </div>
         <button type="button" class="close" (click)="closed.emit()" aria-label="Cerrar"><i class="bx bx-x"></i></button>
       </header>
       <div class="body"><ng-content /></div>

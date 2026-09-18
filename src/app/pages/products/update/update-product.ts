@@ -9,7 +9,7 @@ import { updateProduct } from "../../../operations/product/update-product";
   selector: "app-update-product",
   imports: [Modal, InputCnt, NumberInput, SelectCpt, ButtonCnt],
   template: `
-    <app-modal [open]="true" [title]="'Editar ' + product().name" (closed)="closed.emit()">
+    <app-modal [open]="true" variant="drawer" [title]="'Editar ' + product().name" [subtitle]="'SKU ' + product().sku + ' · stock actual ' + product().currentStock" (closed)="closed.emit()">
       <form class="form" (submit)="save($event)">
         <div class="row">
           <app-input name="sku" label="SKU" [(value)]="op.form.sku" [required]="true" />

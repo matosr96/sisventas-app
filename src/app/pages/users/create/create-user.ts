@@ -6,7 +6,7 @@ import { createUser } from "../../../operations/user/create-user";
   selector: "app-create-user",
   imports: [Modal, InputCnt, ButtonCnt],
   template: `
-    <app-modal [open]="open()" title="Nuevo usuario" (closed)="closed.emit()">
+    <app-modal [open]="open()" variant="drawer" title="Nuevo usuario" subtitle="Nace como vendedor; el rol se cambia después." (closed)="closed.emit()">
       <form class="form" (submit)="save($event)">
         <div class="row">
           <app-input name="firstName" label="Nombre" [(value)]="op.form.firstName" [required]="true" />

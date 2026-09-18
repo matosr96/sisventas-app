@@ -1,7 +1,7 @@
 import { Component, computed, inject, input } from "@angular/core";
 import { Router, RouterLink } from "@angular/router";
 import { Layout } from "../../../components/layout/layout";
-import { ButtonCnt, HeaderPage, Loader } from "../../../components/shared";
+import { ButtonCnt, HeaderPage, Skeleton } from "../../../components/shared";
 import { PrivateRoutes, ScreenName } from "../../../constants";
 import { deleteItem } from "../../../operations/delete-item";
 import { downloadSalePdf } from "../../../operations/sale/download-sale-pdf";
@@ -11,7 +11,7 @@ import { formatDateTime, formatMoney } from "../../../utils";
 
 @Component({
   selector: "app-sale-detail",
-  imports: [Layout, HeaderPage, Loader, ButtonCnt, RouterLink],
+  imports: [Layout, HeaderPage, Skeleton, ButtonCnt, RouterLink],
   templateUrl: "./sale-detail.html",
   styleUrl: "./sale-detail.css",
 })
@@ -26,6 +26,7 @@ export class SaleDetail {
   readonly routes = PrivateRoutes;
   readonly formatMoney = formatMoney;
   readonly formatDateTime = formatDateTime;
+  readonly units = computed(() => this.detail.sale()?.items.reduce((sum, item) => sum + item.quantity, 0) ?? 0);
 
   voidSale(): void {
     this.remover.remove(ScreenName.SALE, this.saleId());

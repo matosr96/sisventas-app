@@ -1,10 +1,17 @@
 <header class="header">
-  <div class="titles">
-    <app-breadcrumbs [items]="items()" />
-    <h1 class="title"><i class="bx" [class]="'bx ' + icon()"></i>{{ title() }}</h1>
+  <div class="top">
+    <div class="titles">
+      <app-breadcrumbs [items]="items()" />
+      <h1 class="title">
+        <i class="bx" [class]="'bx ' + icon()"></i>{{ title() }}
+        @if (badge()) { <app-badge [label]="badge()" [tone]="badgeTone()" /> }
+      </h1>
+    </div>
+    <div class="toolbar">
+      @if (searchable()) { <app-search [(value)]="searchTerm" [placeholder]="searchPlaceholder()" /> }
+      <ng-content select="[actions]" />
+      @if (nameButton()) { <app-button [name]="nameButton()" type="button" icon="bx-plus" (clicked)="create.emit()" /> }
+    </div>
   </div>
-  <div class="toolbar">
-    @if (searchable()) { <app-search [(value)]="searchTerm" /> }
-    @if (nameButton()) { <app-button [name]="nameButton()" type="button" icon="bx-plus" (clicked)="create.emit()" /> }
-  </div>
+  <div class="filters"><ng-content select="[filters]" /></div>
 </header>

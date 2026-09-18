@@ -1,8 +1,17 @@
-.overlay { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background-color: var(--overlay); padding: 2rem; z-index: 40; }
-.modal { width: 100%; max-width: 56rem; max-height: 90vh; display: flex; flex-direction: column; background-color: var(--main-color); border-radius: var(--radius); box-shadow: var(--box-shadow-md); }
+.overlay { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background-color: var(--overlay); padding: 2rem; z-index: 40; animation: fade .15s ease; }
+.overlay_drawer { justify-content: flex-end; padding: 0; }
+.modal { width: 100%; max-width: 56rem; max-height: 90vh; display: flex; flex-direction: column; background-color: var(--main-color); border-radius: var(--radius); box-shadow: var(--box-shadow-md); animation: rise .18s ease; }
 .modal_lg { max-width: 96rem; }
-.header { display: flex; align-items: center; justify-content: space-between; padding: 2rem 2.4rem; border-bottom: 1px solid var(--border-color); }
+.drawer { max-width: 52rem; height: 100%; max-height: none; border-radius: 0; animation: slide .2s ease; }
+.header { display: flex; align-items: flex-start; justify-content: space-between; gap: 1.6rem; padding: 2rem 2.4rem; border-bottom: 1px solid var(--border-color); }
+.titles { display: flex; flex-direction: column; gap: 0.2rem; }
 .title { font-size: 1.8rem; font-weight: 600; }
-.close { color: var(--text-muted); font-size: 2.4rem; display: flex; }
-.body { padding: 2.4rem; overflow: auto; }
-@media (max-width: 768px) { .modal { max-height: 100vh; } }
+.subtitle { font-size: 1.3rem; color: var(--text-muted); }
+.close { color: var(--text-muted); font-size: 2.4rem; display: flex; border-radius: var(--radius-sm); }
+.close:hover { background-color: var(--white-one); color: var(--text-color); }
+.body { padding: 2.4rem; overflow: auto; flex: 1; }
+@keyframes fade { from { opacity: 0; } }
+@keyframes rise { from { transform: translateY(0.8rem); opacity: 0; } }
+@keyframes slide { from { transform: translateX(2rem); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .overlay, .modal { animation: none; } }
+@media (max-width: 768px) { .modal { max-height: 100vh; } .drawer { max-width: none; } }

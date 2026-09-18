@@ -1,10 +1,11 @@
 import { Component, computed, inject, signal } from "@angular/core";
 import { Router } from "@angular/router";
-import { Empty, Table, type Row } from "../../components/container";
+import { Empty, Table, badge, type Row } from "../../components/container";
 import { Layout } from "../../components/layout/layout";
-import { HeaderPage, Loader } from "../../components/shared";
+import { FilterChips, HeaderPage, Skeleton, type FilterOption } from "../../components/shared";
 import { PrivateRoutes, ScreenName } from "../../constants";
-import { productStatusLabel, type Product } from "../../entities";
+import { ProductStatus, productStatusLabel, type Product } from "../../entities";
+import { listCategories } from "../../operations/category/list-categories";
 import { deleteItem } from "../../operations/delete-item";
 import { listProducts } from "../../operations/product/list-products";
 import { AuthStore } from "../../store/auth";
@@ -14,7 +15,7 @@ import { UpdateProduct } from "./update/update-product";
 
 @Component({
   selector: "app-products",
-  imports: [Layout, HeaderPage, Loader, Table, Empty, CreateProduct, UpdateProduct],
+  imports: [Layout, HeaderPage, Skeleton, Table, Empty, FilterChips, CreateProduct, UpdateProduct],
   templateUrl: "./products.html",
   styleUrl: "./products.css",
 })
@@ -23,17 +24,31 @@ export class Products {
   readonly auth = inject(AuthStore);
   readonly screen = ScreenName.PRODUCT;
   readonly list = listProducts((product, term) => [product.sku, product.name].join(" ").toLowerCase().includes(term));
+  private readonly categories = listCategories(() => true);
   readonly remover = deleteItem();
   readonly creating = signal(false);
   readonly editing = signal<Product | null>(null);
 
-  /** Los valores derivados (etiquetas, dinero) se calculan aquí, no dentro de la tabla. */
+  readonly statusOptions: FilterOption[] = [
+    { value: ProductStatus.ACTIVE, label: "Activos" }, { value: ProductStatus.INACTIVE, label: "Retirados" },
+  ];
+  readonly categoryOptions = computed<FilterOption[]>(() =>
+    this.categories.items().map((category) => ({ value: String(category.id), label: category.name }))
+  );
+  readonly statusFilter = computed(() => this.list.filters()["status"] ?? null);
+  readonly categoryFilter = computed(() => this.list.filters()["categoryId"] ?? null);
+
+  /** Los valores derivados (etiquetas, dinero, badges) se calculan aquí, no dentro de la tabla. */
   readonly rows = computed<Row[]>(() =>
     this.list.filtered().map((product) => ({
       ...product,
       priceLabel: formatMoney(product.salePrice),
-      statusLabel: productStatusLabel(product.status),
-      stockLabel: product.lowStock != null && product.currentStock <= product.lowStock ? `${product.currentStock} (bajo)` : product.currentStock,
+      statusCell: badge(productStatusLabel(product.status), product.status === ProductStatus.ACTIVE ? "ok" : "neutral"),
+      stockCell: product.currentStock <= 0
+        ? badge("Agotado", "danger")
+        : product.lowStock != null && product.currentStock <= product.lowStock
+          ? badge(`${product.currentStock} · bajo`, "warn")
+          : product.currentStock,
     }))
   );
 

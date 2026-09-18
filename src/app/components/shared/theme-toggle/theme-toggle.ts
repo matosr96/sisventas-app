@@ -13,8 +13,8 @@ import { ThemeModes, UiStore } from "../../../store/ui";
     </div>
   `,
   styles: `
-    .toggle { display: inline-flex; gap: 0.2rem; padding: 0.3rem; border-radius: var(--radius); background-color: var(--white-two); }
-    button { padding: 0.6rem 0.8rem; border-radius: 0.9rem; color: var(--text-muted); display: flex; transition: background-color .2s ease, color .2s ease; }
+    .toggle { display: inline-flex; gap: 0.2rem; padding: 0.3rem; border-radius: var(--radius-sm); background-color: var(--white-two); }
+    button { padding: 0.6rem 0.8rem; border-radius: 0.4rem; color: var(--text-muted); display: flex; transition: background-color .2s ease, color .2s ease; }
     button.active { background-color: var(--main-color); color: var(--blue-bg); box-shadow: var(--box-shadow); }
     i { font-size: 1.8rem; }
   `,

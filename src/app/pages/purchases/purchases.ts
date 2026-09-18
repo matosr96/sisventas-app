@@ -2,7 +2,7 @@ import { Component, computed, inject } from "@angular/core";
 import { Router } from "@angular/router";
 import { Empty, Table, type Row } from "../../components/container";
 import { Layout } from "../../components/layout/layout";
-import { HeaderPage, Loader } from "../../components/shared";
+import { HeaderPage, Skeleton } from "../../components/shared";
 import { PrivateRoutes, ScreenName } from "../../constants";
 import { deleteItem } from "../../operations/delete-item";
 import { listPurchases } from "../../operations/purchase/list-purchases";
@@ -10,7 +10,7 @@ import { formatDateTime, formatMoney } from "../../utils";
 
 @Component({
   selector: "app-purchases",
-  imports: [Layout, HeaderPage, Loader, Table, Empty],
+  imports: [Layout, HeaderPage, Skeleton, Table, Empty],
   templateUrl: "./purchases.html",
   styleUrl: "./purchases.css",
 })

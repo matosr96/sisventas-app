@@ -2,6 +2,7 @@
   class="button"
   [class.ghost]="variant() === 'ghost'"
   [class.danger]="variant() === 'danger'"
+  [class.lg]="size() === 'lg'"
   [type]="type()"
   [disabled]="disabled()"
   (click)="clicked.emit()"

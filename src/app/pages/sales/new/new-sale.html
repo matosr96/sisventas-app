@@ -1,28 +1,68 @@
 <app-layout>
-  <app-header-page title="Registrar venta" icon="bx-receipt" [items]="['Inicio', 'Ventas', 'Nueva']" [searchable]="false" />
-  <a class="back" [routerLink]="routes.SALES"><i class="bx bx-arrow-back"></i>Volver a ventas</a>
+  <app-header-page title="Registrar venta" icon="bx-receipt" [items]="['Inicio', 'Ventas', 'Nueva']" [searchable]="false">
+    <a actions class="back" [routerLink]="routes.SALES"><i class="bx bx-arrow-back"></i>Volver a ventas</a>
+  </app-header-page>
   @if (op.isLoading()) {
-    <app-loader />
+    <app-skeleton variant="cards" [count]="8" />
+  } @else if (op.isError()) {
+    <p class="error">No se pudo cargar el catálogo. Reintenta en unos segundos.</p>
   } @else {
-    <form class="card" (submit)="op.submit($event)">
-      <h2 class="section">Líneas</h2>
-      @for (line of op.lines(); track $index; let i = $index) {
-        <div class="line">
-          <app-select name="product" label="Producto" [options]="productOptions()" [value]="line.productId" (valueChange)="op.setLine(i, { productId: $event })" [required]="true" />
-          <app-number-input name="quantity" label="Cantidad" [value]="line.quantity" (valueChange)="op.setLine(i, { quantity: $event })" [min]="1" step="1" [required]="true" />
-          <div class="price">
-            <span class="price_label">Precio</span>
-            <span class="price_value">{{ formatMoney(op.productById(line.productId)?.salePrice ?? 0) }}</span>
-          </div>
-          <button type="button" class="remove" (click)="op.removeLine(i)" [disabled]="op.lines().length === 1" aria-label="Quitar línea"><i class="bx bx-x"></i></button>
+    <div class="pos">
+      <section class="catalog">
+        <div class="catalog_bar">
+          <!-- Enter (teclado o lector de código de barras) añade el producto: keydown lo captura y el form cubre el envío implícito. -->
+          <form class="search" (submit)="onSearchEnter($event)">
+            <i class="bx bx-barcode-reader"></i>
+            <input class="search_input" type="search" placeholder="SKU o nombre; Enter añade el producto" [value]="op.searchTerm()" (input)="onSearch($event)" (keydown.enter)="onSearchEnter($event)" aria-label="Buscar producto" />
+          </form>
+          @if (categoryOptions().length > 0) { <app-filter-chips [options]="categoryOptions()" [(value)]="op.categoryId" /> }
         </div>
-      }
-      <div class="toolbar">
-        <app-button name="Añadir línea" type="button" variant="ghost" icon="bx-plus" (clicked)="op.addLine()" />
-        <span class="total">Total estimado: <strong>{{ formatMoney(op.estimatedTotal()) }}</strong></span>
-      </div>
-      <p class="hint">El precio se congela al registrar y el total lo calcula el servidor: esto es una estimación con el precio actual.</p>
-      <app-button [name]="op.pending() ? 'Registrando…' : 'Registrar venta'" [disabled]="op.pending()" />
-    </form>
+        @if (op.visible().length === 0) {
+          <p class="catalog_empty">Ningún producto coincide. Prueba con otro SKU o nombre.</p>
+        } @else {
+          <div class="grid">
+            @for (product of op.visible(); track product.id) {
+              <app-product-tile [product]="product" [quantity]="op.quantityOf(product.id)" [disabled]="product.currentStock <= 0" (pick)="op.add($event)" />
+            }
+          </div>
+        }
+      </section>
+
+      <form class="cart" (submit)="op.submit($event)">
+        <header class="cart_head">
+          <h2 class="cart_title">Pedido</h2>
+          @if (op.cart().length > 0) { <button type="button" class="cart_clear" (click)="op.clear()">Vaciar</button> }
+        </header>
+        @if (op.cart().length === 0) {
+          <div class="cart_empty"><i class="bx bx-cart"></i><p>Toca un producto del catálogo para añadirlo.</p></div>
+        } @else {
+          <ul class="lines">
+            @for (line of op.cart(); track line.product.id) {
+              <li class="line">
+                <div class="line_info">
+                  <span class="line_name">{{ line.product.name }}</span>
+                  <span class="line_meta">{{ formatMoney(line.product.salePrice) }} c/u</span>
+                </div>
+                <div class="stepper">
+                  <button type="button" class="step" (click)="op.decrement(line.product.id)" aria-label="Una menos"><i class="bx bx-minus"></i></button>
+                  <input class="qty" type="number" min="0" step="1" [max]="line.product.currentStock" [value]="line.quantity" (change)="onQuantity(line.product.id, $event)" aria-label="Cantidad" />
+                  <button type="button" class="step" (click)="op.increment(line.product.id)" [disabled]="line.quantity >= line.product.currentStock" aria-label="Una más"><i class="bx bx-plus"></i></button>
+                </div>
+                <span class="line_subtotal">{{ formatMoney(line.subtotal) }}</span>
+                <button type="button" class="line_remove" (click)="op.remove(line.product.id)" aria-label="Quitar"><i class="bx bx-x"></i></button>
+              </li>
+            }
+          </ul>
+        }
+        <footer class="cart_foot">
+          <div class="summary">
+            <span class="summary_row"><span>Artículos</span><span>{{ op.itemCount() }}</span></span>
+            <span class="summary_row total"><span>Total estimado</span><span>{{ formatMoney(op.estimatedTotal()) }}</span></span>
+          </div>
+          <p class="hint">El precio se congela al registrar y el total lo calcula el servidor.</p>
+          <app-button [name]="op.pending() ? 'Registrando…' : 'Cobrar ' + formatMoney(op.estimatedTotal())" size="lg" icon="bx-check" [disabled]="op.pending() || op.cart().length === 0" />
+        </footer>
+      </form>
+    </div>
   }
 </app-layout>

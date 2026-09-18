@@ -1,12 +1,16 @@
 <app-layout>
-  <app-header-page title="Proveedores" icon="bx-store" [items]="['Inicio', 'Proveedores']"
-    nameButton="Crear proveedor" [(searchTerm)]="list.searchTerm" (create)="creating.set(true)" />
-  @if (list.isLoading()) { <app-loader /> }
+  <app-header-page title="Proveedores" icon="bx-store" [items]="['Inicio', 'Proveedores']" searchPlaceholder="Nombre, NIT o contacto…"
+    nameButton="Crear proveedor" [(searchTerm)]="list.searchTerm" (create)="creating.set(true)">
+    <app-filter-chips filters label="Estado" [options]="statusOptions" [value]="statusFilter()" (valueChange)="list.setFilter('status', $event)" />
+  </app-header-page>
+  @if (list.isLoading()) { <app-skeleton /> }
   @else if (list.isError()) { <p class="error">No se pudieron cargar los proveedores. Reintenta en unos segundos.</p> }
-  @else if (rows().length > 0) {
-    <app-table [data]="rows()" [headers]="['Nombre', 'NIT', 'Teléfono', 'Correo', 'Estado']" [keys]="['name', 'taxId', 'phone', 'email', 'statusLabel']" [screenName]="screen" (edit)="edit($event)" (remove)="remove($event)" />
-  } @else {
+  @else if (list.items().length === 0) {
     <app-empty title="Proveedores" copy="Registra a quién le compras: nombre, NIT y contacto." buttonName="Crear proveedor" (create)="creating.set(true)" />
+  } @else if (rows().length === 0) {
+    <app-empty variant="no-results" (clear)="list.clearFilters()" />
+  } @else {
+    <app-table [data]="rows()" [headers]="['Nombre', 'NIT', 'Teléfono', 'Correo', 'Estado']" [keys]="['name', 'taxId', 'phone', 'email', 'statusCell']" [screenName]="screen" (edit)="edit($event)" (remove)="remove($event)" />
   }
 </app-layout>
 <app-create-supplier [open]="creating()" (closed)="creating.set(false)" />

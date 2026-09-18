@@ -1,7 +1,7 @@
 import { Component, computed, inject, input } from "@angular/core";
 import { Router, RouterLink } from "@angular/router";
 import { Layout } from "../../../components/layout/layout";
-import { ButtonCnt, HeaderPage, Loader } from "../../../components/shared";
+import { ButtonCnt, HeaderPage, Skeleton } from "../../../components/shared";
 import { PrivateRoutes, ScreenName } from "../../../constants";
 import { deleteItem } from "../../../operations/delete-item";
 import { getPurchase } from "../../../operations/purchase/get-purchase";
@@ -10,7 +10,7 @@ import { formatDateTime, formatMoney } from "../../../utils";
 
 @Component({
   selector: "app-purchase-detail",
-  imports: [Layout, HeaderPage, Loader, ButtonCnt, RouterLink],
+  imports: [Layout, HeaderPage, Skeleton, ButtonCnt, RouterLink],
   templateUrl: "./purchase-detail.html",
   styleUrl: "./purchase-detail.css",
 })
@@ -23,6 +23,7 @@ export class PurchaseDetail {
   readonly routes = PrivateRoutes;
   readonly formatMoney = formatMoney;
   readonly formatDateTime = formatDateTime;
+  readonly units = computed(() => this.detail.purchase()?.items.reduce((sum, item) => sum + item.quantity, 0) ?? 0);
 
   voidPurchase(): void {
     this.remover.remove(ScreenName.PURCHASE, Number(this.id()));

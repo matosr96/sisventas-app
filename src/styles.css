@@ -3,7 +3,9 @@
 
 :root {
   --font: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --radius: 1.2rem;
+  /* Radios: pequeño para controles (botones, campos, chips), normal para superficies (tarjetas, modales). */
+  --radius-sm: 0.6rem;
+  --radius: 1rem;
   --sidebar-width: 24rem;
 
   /* Superficies */
@@ -35,10 +37,14 @@
   --red-dark: #b91c1c;
   --red-soft: #fee2e2;
 
-  --box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06), 0 1px 3px rgba(15, 23, 42, 0.08);
-  --box-shadow-md: 0 10px 30px rgba(15, 23, 42, 0.18);
+  --box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05), 0 1px 3px rgba(15, 23, 42, 0.06);
+  --box-shadow-md: 0 12px 32px rgba(15, 23, 42, 0.16);
   --scrollbar-thumb: #cbd5e1;
   --scrollbar-thumb-hover: #94a3b8;
+
+  /* Esqueletos de carga: base y brillo que la recorre */
+  --skeleton-base: #e8ecf5;
+  --skeleton-shine: #f6f8fc;
 }
 
 :root[data-theme="dark"] {
@@ -68,10 +74,13 @@
   --red-dark: #fca5a5;
   --red-soft: #3f1519;
 
-  --box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
-  --box-shadow-md: 0 10px 30px rgba(0, 0, 0, 0.6);
+  --box-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+  --box-shadow-md: 0 12px 32px rgba(0, 0, 0, 0.55);
   --scrollbar-thumb: #334155;
   --scrollbar-thumb-hover: #475569;
+
+  --skeleton-base: #1a2540;
+  --skeleton-shine: #243252;
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -85,6 +94,7 @@ body {
   line-height: 1.5;
   color: var(--text-color);
   background-color: var(--bg-color);
+  font-variant-numeric: tabular-nums; /* cifras de ancho fijo: las columnas de dinero se alinean */
   -webkit-font-smoothing: antialiased;
   transition: background-color .2s ease, color .2s ease;
 }

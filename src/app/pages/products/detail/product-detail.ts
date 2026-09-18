@@ -1,7 +1,7 @@
 import { Component, computed, inject, input, signal } from "@angular/core";
 import { RouterLink } from "@angular/router";
 import { Layout } from "../../../components/layout/layout";
-import { ButtonCnt, HeaderPage, InputCnt, Loader, Modal, NumberInput } from "../../../components/shared";
+import { ButtonCnt, HeaderPage, InputCnt, Modal, NumberInput, Skeleton } from "../../../components/shared";
 import { PrivateRoutes } from "../../../constants";
 import { movementTypeLabel, productStatusLabel } from "../../../entities";
 import { adjustStock } from "../../../operations/inventory/adjust-stock";
@@ -12,7 +12,7 @@ import { formatDateTime, formatMoney } from "../../../utils";
 
 @Component({
   selector: "app-product-detail",
-  imports: [Layout, HeaderPage, Loader, Modal, NumberInput, InputCnt, ButtonCnt, RouterLink],
+  imports: [Layout, HeaderPage, Skeleton, Modal, NumberInput, InputCnt, ButtonCnt, RouterLink],
   templateUrl: "./product-detail.html",
   styleUrl: "./product-detail.css",
 })

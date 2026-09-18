@@ -7,7 +7,7 @@ import { createProduct } from "../../../operations/product/create-product";
   selector: "app-create-product",
   imports: [Modal, InputCnt, NumberInput, SelectCpt, ButtonCnt],
   template: `
-    <app-modal [open]="open()" title="Nuevo producto" (closed)="closed.emit()">
+    <app-modal [open]="open()" variant="drawer" title="Nuevo producto" subtitle="SKU, precio y stock inicial; la categoría es opcional." (closed)="closed.emit()">
       <form class="form" (submit)="save($event)">
         <div class="row">
           <app-input name="sku" label="SKU" [(value)]="op.form.sku" [required]="true" placeholder="COCA-350" />

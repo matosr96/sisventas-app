@@ -1,6 +1,9 @@
-.header { display: flex; align-items: flex-end; justify-content: space-between; gap: 2rem; margin-bottom: 2.4rem; }
+.header { display: flex; flex-direction: column; gap: 1.2rem; margin-bottom: 2rem; }
+.top { display: flex; align-items: flex-end; justify-content: space-between; gap: 2rem; }
 .titles { display: flex; flex-direction: column; gap: 0.6rem; }
 .title { display: flex; align-items: center; gap: 1rem; font-size: 2.4rem; font-weight: 600; }
 .title i { color: var(--blue-bg); }
 .toolbar { display: flex; align-items: center; gap: 1.2rem; }
-@media (max-width: 768px) { .header, .toolbar { flex-direction: column; align-items: stretch; } }
+.filters { display: flex; flex-wrap: wrap; align-items: center; gap: 1.6rem; }
+.filters:empty { display: none; }
+@media (max-width: 768px) { .top, .toolbar { flex-direction: column; align-items: stretch; } }

@@ -1,25 +1,29 @@
 <app-layout>
-  @if (detail.isLoading()) { <app-loader /> }
+  @if (detail.isLoading()) { <app-skeleton variant="detail" [count]="3" [rows]="3" /> }
   @else if (detail.purchase(); as purchase) {
-    <app-header-page [title]="'Compra ' + purchase.purchaseNumber" icon="bx-cart-download" [items]="['Inicio', 'Compras', purchase.purchaseNumber]" [searchable]="false" />
+    <app-header-page [title]="'Compra ' + purchase.purchaseNumber" icon="bx-cart-download" [items]="['Inicio', 'Compras', purchase.purchaseNumber]" [searchable]="false" badge="Recibida" badgeTone="ok">
+      @if (auth.isAdmin()) {
+        <div actions class="actions"><app-button name="Anular" type="button" variant="danger" icon="bx-trash" (clicked)="voidPurchase()" /></div>
+      }
+    </app-header-page>
     <a class="back" [routerLink]="routes.PURCHASES"><i class="bx bx-arrow-back"></i>Volver a compras</a>
     <section class="card">
       <div class="facts">
         <div class="fact"><span class="fact_label">Proveedor</span><span class="fact_value">{{ purchase.supplierName }}</span></div>
         <div class="fact"><span class="fact_label">Fecha</span><span class="fact_value">{{ formatDateTime(purchase.purchaseDate) }}</span></div>
-        <div class="fact"><span class="fact_label">Total</span><span class="fact_value">{{ formatMoney(purchase.total) }}</span></div>
+        <div class="fact"><span class="fact_label">Unidades</span><span class="fact_value">{{ units() }}</span></div>
       </div>
       <table class="table">
         <thead><tr><th>SKU</th><th>Producto</th><th class="num">Cantidad</th><th class="num">Costo unit.</th><th class="num">Subtotal</th></tr></thead>
         <tbody>
           @for (item of purchase.items; track item.id) {
-            <tr><td>{{ item.productSku }}</td><td>{{ item.productName }}</td><td class="num">{{ item.quantity }}</td><td class="num">{{ formatMoney(item.unitCost) }}</td><td class="num">{{ formatMoney(item.subtotal) }}</td></tr>
+            <tr><td class="muted">{{ item.productSku }}</td><td>{{ item.productName }}</td><td class="num">{{ item.quantity }}</td><td class="num">{{ formatMoney(item.unitCost) }}</td><td class="num">{{ formatMoney(item.subtotal) }}</td></tr>
           }
         </tbody>
       </table>
-      @if (auth.isAdmin()) {
-        <div class="toolbar"><app-button name="Anular compra" type="button" variant="danger" icon="bx-trash" (clicked)="voidPurchase()" /></div>
-      }
+      <div class="totals">
+        <span class="totals_row grand"><span>Total</span><span>{{ formatMoney(purchase.total) }}</span></span>
+      </div>
     </section>
   } @else { <p class="error">No se pudo cargar la compra.</p> }
 </app-layout>

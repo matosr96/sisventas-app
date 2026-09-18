@@ -10,6 +10,7 @@ export class ButtonCnt {
   readonly type = input<"submit" | "button">("submit");
   readonly variant = input<"primary" | "ghost" | "danger">("primary");
   readonly icon = input("");
+  readonly size = input<"md" | "lg">("md");
   readonly disabled = input(false);
   readonly clicked = output<void>();
 }

@@ -1,25 +1,30 @@
 <app-layout>
-  @if (detail.isLoading()) { <app-loader /> }
+  @if (detail.isLoading()) { <app-skeleton variant="detail" [count]="3" [rows]="3" /> }
   @else if (detail.sale(); as sale) {
-    <app-header-page [title]="'Factura ' + sale.saleNumber" icon="bx-receipt" [items]="['Inicio', 'Ventas', sale.saleNumber]" [searchable]="false" />
+    <app-header-page [title]="'Factura ' + sale.saleNumber" icon="bx-receipt" [items]="['Inicio', 'Ventas', sale.saleNumber]" [searchable]="false" badge="Registrada" badgeTone="ok">
+      <div actions class="actions">
+        <app-button [name]="pdf.pending() ? 'Generando…' : 'PDF'" type="button" variant="ghost" icon="bx-file" [disabled]="pdf.pending()" (clicked)="pdf.open(saleId())" />
+        @if (auth.isAdmin()) { <app-button name="Anular" type="button" variant="danger" icon="bx-trash" (clicked)="voidSale()" /> }
+      </div>
+    </app-header-page>
     <a class="back" [routerLink]="routes.SALES"><i class="bx bx-arrow-back"></i>Volver a ventas</a>
     <section class="card">
       <div class="facts">
         <div class="fact"><span class="fact_label">Fecha</span><span class="fact_value">{{ formatDateTime(sale.saleDate) }}</span></div>
         <div class="fact"><span class="fact_label">Líneas</span><span class="fact_value">{{ sale.items.length }}</span></div>
-        <div class="fact"><span class="fact_label">Total</span><span class="fact_value">{{ formatMoney(sale.total) }}</span></div>
+        <div class="fact"><span class="fact_label">Unidades</span><span class="fact_value">{{ units() }}</span></div>
       </div>
       <table class="table">
         <thead><tr><th>SKU</th><th>Producto</th><th class="num">Cantidad</th><th class="num">Precio unit.</th><th class="num">Subtotal</th></tr></thead>
         <tbody>
           @for (item of sale.items; track item.id) {
-            <tr><td>{{ item.productSku }}</td><td>{{ item.productName }}</td><td class="num">{{ item.quantity }}</td><td class="num">{{ formatMoney(item.unitPrice) }}</td><td class="num">{{ formatMoney(item.subtotal) }}</td></tr>
+            <tr><td class="muted">{{ item.productSku }}</td><td>{{ item.productName }}</td><td class="num">{{ item.quantity }}</td><td class="num">{{ formatMoney(item.unitPrice) }}</td><td class="num">{{ formatMoney(item.subtotal) }}</td></tr>
           }
         </tbody>
       </table>
-      <div class="toolbar">
-        <app-button [name]="pdf.pending() ? 'Generando…' : 'Descargar PDF'" type="button" variant="ghost" icon="bx-file" [disabled]="pdf.pending()" (clicked)="pdf.open(saleId())" />
-        @if (auth.isAdmin()) { <app-button name="Anular venta" type="button" variant="danger" icon="bx-trash" (clicked)="voidSale()" /> }
+      <div class="totals">
+        <span class="totals_row"><span>Subtotal</span><span>{{ formatMoney(sale.total) }}</span></span>
+        <span class="totals_row grand"><span>Total</span><span>{{ formatMoney(sale.total) }}</span></span>
       </div>
     </section>
   } @else { <p class="error">No se pudo cargar la venta.</p> }

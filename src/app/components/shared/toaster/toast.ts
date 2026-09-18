@@ -20,6 +20,8 @@ export class Toast {
 
   success(text: string): void { this.push("success", text); }
   error(text: string): void { this.push("error", text); }
+  /** Aviso informativo que no bloquea nada (un tope alcanzado, un dato corregido). */
+  notice(text: string): void { this.push("warning", text); }
 
   /** Confirmación destructiva: acción + cancelar. Nunca window.confirm. */
   warning(text: string, action: ToastAction, cancel?: ToastAction): void {
