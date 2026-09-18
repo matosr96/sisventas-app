@@ -21,7 +21,8 @@ export class Actions {
   readonly canEdit = computed(() =>
     this.screenName() !== ScreenName.SALE && this.screenName() !== ScreenName.PURCHASE && this.auth.isAdmin()
   );
-  readonly canDelete = computed(() => this.auth.isAdmin());
+  // Los usuarios no se borran: se desactivan desde su edición. Sin botón que no haga nada.
+  readonly canDelete = computed(() => this.screenName() !== ScreenName.USER && this.auth.isAdmin());
   readonly removeLabel = computed(() =>
     this.screenName() === ScreenName.SALE || this.screenName() === ScreenName.PURCHASE ? "Anular" : "Eliminar"
   );
